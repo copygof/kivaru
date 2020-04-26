@@ -115,10 +115,11 @@ const useStyles = makeStyles({
   },
 })
 
-function DayBadge({ children, onClick, isActive }: any) {
+function DayBadge({ children, onClick, isActive, disabled }: any) {
   const classes = useStyles()
   return (
     <ButtonBase
+      disabled={disabled}
       className={isActive ? classes.dayBadgeActive : classes.dayBadge}
       onClick={onClick}
     >
@@ -129,10 +130,11 @@ function DayBadge({ children, onClick, isActive }: any) {
   )
 }
 
-function TimeBadge({ children, onClick, isActive }: any) {
+function TimeBadge({ children, onClick, isActive, disabled }: any) {
   const classes = useStyles()
   return (
     <ButtonBase
+      disabled={disabled}
       className={isActive ? classes.timeBadgeActive : classes.timeBadge}
       onClick={onClick}
     >
@@ -146,10 +148,12 @@ function TimeBadge({ children, onClick, isActive }: any) {
 export type DoctorWorkingDateProps = {
   isDisabledDate?: boolean
   isDisabledTime?: boolean
-  onClickDate: (value: any) => void
-  onClickTime: (value: any) => void
-  onSelectDay: (value: any) => void
-  onSelectTime: (value: any) => void
+  isDisabledDateList?: boolean
+  isDisabledTimeList?: boolean
+  onClickDate?: (value: any) => void
+  onClickTime?: (value: any) => void
+  onSelectDay?: (value: any) => void
+  onSelectTime?: (value: any) => void
   dayList: any[]
   timeList: any[]
 }
@@ -162,12 +166,18 @@ function DoctorWorkingDate(props: DoctorWorkingDateProps) {
 
   const handleDateChange = (date: any | null) => {
     setSelectedDate(date)
-    props.onClickDate(date)
+
+    if (props.onClickDate) {
+      props.onClickDate(date)
+    }
   }
 
   const handleTimeChange = (date: any | null) => {
     setSelectedTime(date)
-    props.onClickTime(date)
+
+    if (props.onClickTime) {
+      props.onClickTime(date)
+    }
   }
 
   return (
@@ -199,7 +209,12 @@ function DoctorWorkingDate(props: DoctorWorkingDateProps) {
               <DayBadge
                 key={day.name}
                 isActive={day.isActive}
-                onClick={() => props.onSelectDay(day)}
+                disabled={props.isDisabledDateList}
+                onClick={() => {
+                  if (props.onSelectDay) {
+                    props.onSelectDay(day)
+                  }
+                }}
               >
                 {day.name}
               </DayBadge>
@@ -224,7 +239,12 @@ function DoctorWorkingDate(props: DoctorWorkingDateProps) {
             <TimeBadge
               key={time.name}
               isActive={time.isActive}
-              onClick={() => props.onSelectTime(time)}
+              disabled={props.isDisabledTimeList}
+              onClick={() => {
+                if (props.onSelectTime) {
+                  props.onSelectTime(time)
+                }
+              }}
             >
               {time.name}
             </TimeBadge>
@@ -238,6 +258,10 @@ function DoctorWorkingDate(props: DoctorWorkingDateProps) {
 DoctorWorkingDate.defaultProps = {
   isDisabledDate: true,
   isDisabledTime: true,
+  isDisabledDateList: false,
+  isDisabledTimeList: false,
+  onSelectDay() {},
+  onSelectTime() {},
   onClickDate() {},
   onClickTime() {},
 }

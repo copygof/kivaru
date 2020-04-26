@@ -1,10 +1,12 @@
-// import * as user from "./user"
+import * as user from "./user"
 import * as doctor from "./doctor"
+import * as nurse from "./nurse"
 import * as booking from "./booking"
 
 const resource = {
-  // user,
+  user,
   doctor,
+  nurse,
   booking,
 }
 

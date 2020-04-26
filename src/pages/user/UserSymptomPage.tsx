@@ -7,6 +7,7 @@ import { Dialog } from "@material-ui/core"
 import MoonLoader from "react-spinners/MoonLoader"
 import { useSelector } from "react-redux"
 import fireStore from "../../fireStore"
+import moment from "moment"
 
 function ButtonCountDay({ onClick, arrow }: any) {
   return (
@@ -45,14 +46,16 @@ const UserSymptomPage = () => {
   async function handleSubmit() {
     try {
       setOpen(true)
-      const bookingDate = new Date(dateTime || "")
+      const datetime = moment(dateTime, "DD-MM-YYYY HH:mm:ss")
+      // const bookingDate =  new Date(dateTime || "")
       const response = await fireStore.booking.createBooking({
-        requestBy: userId, // TODO
-        requestTo: id || "",
-        datetime: bookingDate, // TODO
+        userId, // TODO
+        doctorId: id || "",
+        // datetime: bookingDate, // TODO
+        datetime: datetime.utc().toDate(), // TODO
         symptom,
         dayOfSymptom: dayOfSymptom,
-        attachment: "",
+        attachment: [],
       })
       setOpen(false)
       history.replace(`/user/home`)
@@ -91,7 +94,12 @@ const UserSymptomPage = () => {
             How many days?
           </Typography>
         </Box>
-        <Box marginTop={2} display="flex" justifyContent="center">
+        <Box
+          marginTop={2}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
           <ButtonCountDay
             arrow="down"
             onClick={() => setDayOfSymptom(dayOfSymptom - 1)}

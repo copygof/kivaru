@@ -9,6 +9,7 @@ import UserRoute from "./UserRoute"
 import DoctorRoute from "./DoctorRoute"
 import { CSSTransition, TransitionGroup } from "react-transition-group"
 import UserSelector from "../pages/user/UserSelector"
+import NurseRoute from "./NurseRoute"
 
 export default function RootRoute() {
   // let location = useLocation()
@@ -33,6 +34,9 @@ export default function RootRoute() {
             </Route>
             <Route path="/doctor">
               <DoctorRoute />
+            </Route>
+            <Route path="/nurse">
+              <NurseRoute />
             </Route>
             <Route path="/test">
               <p>Not test</p>

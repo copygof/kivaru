@@ -1,10 +1,15 @@
-// @ts-nocheck
-import React from "react"
-import NavbarLayout from "../../components/layout/NavbarLayout"
+import React, { useState, useEffect } from "react"
 import { useParams, useHistory } from "react-router-dom"
 import DoctorInfo from "../../components/features/doctor/DoctorInfo"
-import { Loading } from "../../components/common/Loading"
-import { Button, Box, Grid } from "@material-ui/core"
+import NavbarLayout from "../../components/layout/NavbarLayout"
+import resource from "../../resource"
+import { useSelector } from "react-redux"
+import DoctorWorkingDate from "../../components/features/doctor/DoctorWorkingDate"
+import MoonLoader from "react-spinners/MoonLoader"
+import { DoctorSchema, WorkingDay, WorkingTime } from "../../fireStore/doctor"
+
+import { Button, Dialog } from "@material-ui/core"
+import fireStore from "../../fireStore"
 // import DateFnsUtils from "@date-io/date-fns"
 import MomentUtils from "@date-io/moment"
 import moment from "moment"
@@ -13,126 +18,107 @@ import {
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers"
+import { UserSchema } from "../../fireStore/user"
+import DoctorSpecial from "../doctor/DoctorSpecial"
+import { Loading } from "../../components/common/Loading"
 
-const doctorDetail = {
-  id: "uiGainnyvn2wSbYTRY0t",
-  userId: "uiGainnyvn2wSbYTRY0t",
-  specificSkill: "Cosmetic Dermatology",
-  description: "",
-  review: [],
-  hospital: "Thammasat University Hospital",
-  graduate: "",
-  ratings: 4.5,
-  userGroup: "doctor",
-  address: {
-    country: "",
-    addressLine3: "",
-    postCode: "",
-    addressLine2: "",
-    zip: "",
-    address: "",
-    addressLine1: "",
-    city: "",
-    state: "",
-  },
-  profile: {
-    gender: "male",
-    firstName: "Dr. Gateorn",
-    phoneNumber: "1111111111",
-    dob: { seconds: 1587309685, nanoseconds: 532000000 },
-    email: "dsadsa",
-    imageProfile: "rewrwerew",
-    lastName: "Pongarnar",
-  },
-  account: {
-    tempPassword: "",
-    isForceResetPassword: false,
-    type: "normal",
-    isCompleteRegister: false,
-    identity: { phoneNumber: {}, google: {}, facebook: {} },
-    identityChannel: "phoneNumber",
-  },
+type DoctorDetail = DoctorSchema & UserSchema
+
+type DoctorProfileProps = {
+  doctorDetail: DoctorDetail
 }
 
-function AppointmentDetail() {
+function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
   const history = useHistory()
-  const { id } = useParams()
-  const [selectedDate, setSelectedDate] = React.useState<Date | null>(
-    new Date()
-  )
+  const [open, setOpen] = useState(false)
 
-  const handleDateChange = (date: Date | null) => {
+  const [selectedDate, setSelectedDate] = React.useState<Date | null>(null)
+  const [selectedTime, setSelectedTime] = React.useState<Date | null>(null)
+
+  const handleDateChange = (date: any | null) => {
+    // const dateTime = moment(date).format("DD-MM-YYYY HH:mm:ss")
+    // console.log("date => ", date)
+    // console.log("handleDateChange => ", dateTime)
     setSelectedDate(date)
   }
 
-  // const doctorDetail: DoctorSchema & UserSchema = resource.doctor.detail.read(
-  //   id
-  // )
+  const handleTimeChange = (date: any | null) => {
+    // console.log("handleTimeChange => ", date)
+    setSelectedTime(date)
+  }
 
-  function handleOnSubmit() {
-    const dateTime = moment(selectedDate).format("DD-MM-YYYY HH:mm:ss")
-    history.push(`/user/symptom/${id}/${selectedDate}`)
+  function handleClose() {
+    setOpen(false)
+  }
+
+  async function onSubmit() {
+    // @ts-ignore
+    const selectedDateM = moment(selectedDate).format("DD-MM-YYYY")
+    // @ts-ignore
+    const selectedTimeM = moment(selectedTime).format("HH:mm:ss")
+    const dateTime = moment(
+      `${selectedDateM} ${selectedTimeM}`,
+      "DD-MM-YYYY HH:mm:ss"
+    )
+
+    history.push(
+      `/user/symptom/${doctorDetail.id}/${selectedDateM} ${selectedTimeM}`
+    )
   }
 
   return (
-    <>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        padding: 0,
+        justifyContent: "flex-start",
+      }}
+    >
       <DoctorInfo
         isPreview
         name={`${doctorDetail.profile?.firstName} ${doctorDetail.profile?.lastName}`}
-        skill={doctorDetail.specificSkill}
+        skill={doctorDetail.graduate}
         location={doctorDetail.hospital}
+        image={doctorDetail.profile.imageProfile}
         rating={0}
       />
-      <Box
-        height="307px"
-        borderColor="#19769F"
-        border={1}
-        padding={1}
-        borderRadius={4}
-        marginTop="18px"
-        marginBottom={4}
-        width="auto"
-      >
-        <MuiPickersUtilsProvider utils={MomentUtils}>
-          <Grid container justify="space-around">
-            <KeyboardDatePicker
-              margin="normal"
-              id="date-picker-dialog"
-              label="Date picker dialog"
-              format="MM/dd/yyyy"
-              value={selectedDate}
-              onChange={handleDateChange}
-              KeyboardButtonProps={{
-                "aria-label": "change date",
-              }}
-            />
-          </Grid>
-          <Grid container justify="space-around">
-            <KeyboardTimePicker
-              margin="normal"
-              id="time-picker"
-              label="Time picker"
-              value={selectedDate}
-              onChange={handleDateChange}
-              KeyboardButtonProps={{
-                "aria-label": "change time",
-              }}
-            />
-          </Grid>
-        </MuiPickersUtilsProvider>
-      </Box>
-      <Button variant="contained" color="primary" onClick={handleOnSubmit}>
+      <DoctorWorkingDate
+        isDisabledDate={false}
+        isDisabledTime={false}
+        isDisabledDateList
+        isDisabledTimeList
+        dayList={doctorDetail.working?.day || []}
+        timeList={doctorDetail.working?.time || []}
+        onClickDate={handleDateChange}
+        onClickTime={handleTimeChange}
+      />
+      <DoctorSpecial skill={doctorDetail.specificSkill} />
+      <Button variant="contained" color="primary" onClick={onSubmit}>
         Appointment
       </Button>
-    </>
+      <Dialog onClose={handleClose} open={open}>
+        <MoonLoader color="#FF2E29" />
+      </Dialog>
+    </div>
   )
+}
+
+function DoctorProfileFetcher() {
+  const { id } = useParams()
+
+  const doctorDetail: DoctorSchema & UserSchema = resource.doctor.detail.read(
+    id
+  )
+
+  return <DoctorProfile doctorDetail={doctorDetail} />
 }
 
 const UserAppointment = () => {
   return (
     <NavbarLayout pageTitle="Doctor Details">
       <React.Suspense fallback={<Loading />}>
-        <AppointmentDetail />
+        <DoctorProfileFetcher />
       </React.Suspense>
     </NavbarLayout>
   )

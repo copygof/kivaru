@@ -12,7 +12,6 @@ import { UserSchema } from "../../fireStore/user"
 import { Button, Dialog } from "@material-ui/core"
 import { useHistory } from "react-router-dom"
 import fireStore from "../../fireStore"
-import { login } from "../../redux/auth"
 
 type DoctorDetail = DoctorSchema & UserSchema
 

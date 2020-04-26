@@ -16,6 +16,9 @@ const UserSelector = () => {
         case "doctor":
           history.push("/doctor/login")
           break
+        case "nurse":
+          history.push("/nurse/login")
+          break
         default:
           break
       }

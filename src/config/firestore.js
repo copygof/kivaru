@@ -1,6 +1,7 @@
 import * as firebase from "firebase/app"
 import "firebase/auth"
 import "firebase/firestore"
+import "firebase/storage"
 
 // const functions = require("firebase-functions")
 
@@ -19,6 +20,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 
 const db = firebase.firestore()
+// .settings({
+//   cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
+// })
+// db.settings({ persistence: false })
+
 export const auth = firebase.auth()
+export const storage = firebase.storage()
 
 export default db

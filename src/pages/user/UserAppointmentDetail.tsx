@@ -9,6 +9,7 @@ import { DoctorSchema } from "../../fireStore/doctor"
 import { makeStyles, withStyles } from "@material-ui/core/styles"
 import { UserSchema } from "../../fireStore/user"
 import { useSelector } from "react-redux"
+import ErrorBoundary from "../../components/common/ErrorBoundary"
 
 const useStyle = makeStyles({
   datetime: {
@@ -37,7 +38,7 @@ const useStyle = makeStyles({
 })
 
 type ItemProps = {
-  datetime: Date
+  datetime: number
   fullName: string
   detail: string
   onClick: () => void
@@ -51,7 +52,7 @@ function Item(props: ItemProps) {
       <Box display="flex" flexDirection="column">
         <Typography variant="h5" className={classes.datetime}>
           {/* {"Wednesday, April 8, 2020 "} */}
-          {moment(props.datetime).format("dddd, MMM D, YYYY : HH:mm")}
+          {moment(props.datetime * 1000).format("dddd, MMM D, YYYY : HH:mm")}
         </Typography>
         <Typography className={classes.name}>{props.fullName}</Typography>
         <Typography className={classes.location}>{props.detail}</Typography>
@@ -72,7 +73,7 @@ function BookingList() {
   }
 
   return (
-    <Box display="flex" justifyContent="space-between" flexDirection="column">
+    <Box display="flex" justifyContent="flex-start" flexDirection="column">
       {bookingList.map((booking: any) => (
         <Item
           key={booking.id}
@@ -89,9 +90,11 @@ function BookingList() {
 export default function UserAppointmentDetail() {
   return (
     <NavbarLayout pageTitle="Appointment Detail">
-      <React.Suspense fallback={<Loading />}>
-        <BookingList />
-      </React.Suspense>
+      <ErrorBoundary errorText="Not found">
+        <React.Suspense fallback={<Loading />}>
+          <BookingList />
+        </React.Suspense>
+      </ErrorBoundary>
     </NavbarLayout>
   )
 }

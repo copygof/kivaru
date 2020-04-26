@@ -6,7 +6,7 @@ import MoonLoader from "react-spinners/MoonLoader"
 import NavbarLayout from "../../components/layout/NavbarLayout"
 import { useHistory } from "react-router-dom"
 
-const UserSignUpPage = () => {
+const NurseSignUpPage = () => {
   const history = useHistory()
   const [open, setOpen] = useState(false)
 
@@ -17,8 +17,8 @@ const UserSignUpPage = () => {
   async function handleSubmit(values: any) {
     try {
       setOpen(true)
-      const response = await fireStore.user.createUser({
-        userGroup: "patient",
+      const response = await fireStore.nurse.createNurse({
+        userGroup: "nurse",
         profile: {
           firstName: values.firstName,
           lastName: values.lastName,
@@ -26,7 +26,7 @@ const UserSignUpPage = () => {
           phoneNumber: values.phone,
           dob: new Date(),
           gender: values.gender,
-          imageProfile: values.image || "",
+          imageProfile: "",
         },
         address: {
           address: "",
@@ -51,11 +51,11 @@ const UserSignUpPage = () => {
           password: values.password,
           tempPassword: "",
           isForceResetPassword: false,
-          isCompleteRegister: true,
+          isCompleteRegister: false,
         },
       })
       setOpen(false)
-      history.replace(`/user/home`)
+      history.replace(`/nurse/register/${response.userId}`)
     } catch (error) {
       setOpen(false)
       console.log("error => ", error)
@@ -67,14 +67,14 @@ const UserSignUpPage = () => {
 
   return (
     <NavbarLayout pageTitle="Sign up">
-      <div>
+      <>
         <SignUpForm onSubmit={handleSubmit} />
         <Dialog onClose={handleClose} open={open}>
           <MoonLoader color="#FF2E29" />
         </Dialog>
-      </div>
+      </>
     </NavbarLayout>
   )
 }
 
-export default UserSignUpPage
+export default NurseSignUpPage

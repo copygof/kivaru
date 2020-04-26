@@ -7,7 +7,10 @@ import {
   Avatar,
   Typography,
   TextField,
+  ButtonBase,
 } from "@material-ui/core"
+import fireStore from "../../../fireStore"
+import { storage } from "../../../config/firestore"
 
 export type SignUpFormProps = {
   onSubmit: (value: any) => void
@@ -19,6 +22,11 @@ export default function SignUpForm(props: SignUpFormProps) {
   const [lastName, setLastName] = useState("")
   const [password, setPassword] = useState("")
   const [gender, setGender] = useState("male")
+  const [lang, setLang] = useState("en")
+  const [image, setImage] = useState({
+    filePath: "",
+    rawImage: null,
+  })
 
   function handleSubmit() {
     props.onSubmit({
@@ -27,6 +35,7 @@ export default function SignUpForm(props: SignUpFormProps) {
       phone,
       password,
       gender,
+      image: image.rawImage,
     })
   }
 
@@ -43,30 +52,74 @@ export default function SignUpForm(props: SignUpFormProps) {
     }
   }
 
+  const handleImageAsFile = (e: any) => {
+    const image = e.target.files[0]
+    setImage({
+      filePath: URL.createObjectURL(image),
+      rawImage: image,
+    })
+  }
+
   return (
     <>
-      <Box display="flex" justifyContent="space-between">
-        <Box>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="flex-start"
+      >
+        <Box display="flex">
           <ButtonGroup
             color="primary"
             aria-label="outlined primary button group"
           >
-            <Button>TH</Button>
-            <Button>EN</Button>
+            <Button
+              onClick={() => setLang("th")}
+              style={{
+                backgroundColor: lang === "th" ? "#FF2E29" : "#ffffff",
+                color: lang === "th" ? "#ffffff" : "#313131",
+              }}
+            >
+              TH
+            </Button>
+            <Button
+              onClick={() => setLang("en")}
+              style={{
+                backgroundColor: lang === "en" ? "#FF2E29" : "#ffffff",
+                color: lang === "en" ? "#ffffff" : "#313131",
+              }}
+            >
+              EN
+            </Button>
           </ButtonGroup>
         </Box>
-        <Box display="flex">
-          <Badge
-            badgeContent="+"
-            color="primary"
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-            overlap="circle"
-          >
-            <Avatar></Avatar>
-          </Badge>
+        <Box display="flex" justifyContent="flex-end">
+          <input
+            type="file"
+            onChange={handleImageAsFile}
+            id="contained-button-file"
+            style={{ display: "none" }}
+          />
+          <label htmlFor="contained-button-file">
+            <ButtonBase component="span">
+              <Badge
+                badgeContent="+"
+                color="primary"
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                overlap="circle"
+              >
+                <Avatar
+                  style={{
+                    width: 77,
+                    height: 77,
+                  }}
+                  src={image.filePath || ""}
+                ></Avatar>
+              </Badge>
+            </ButtonBase>
+          </label>
         </Box>
       </Box>
       <Box marginTop={2} display="flex">
@@ -127,23 +180,22 @@ export default function SignUpForm(props: SignUpFormProps) {
           variant="outlined"
         />
       </Box> */}
-      <Box marginTop={2} display="flex" justifyContent="center">
+      <Box marginTop={2} display="flex" justifyContent="space-between">
         <Button
           variant={gender === "male" ? "contained" : "outlined"}
           color="primary"
-          fullWidth
           style={{
             boxShadow: "none",
+            width: 150,
           }}
           onClick={() => setGender("male")}
         >
           Male
         </Button>
-        <Box width={20} />
         <Button
           variant={gender === "female" ? "contained" : "outlined"}
           color="primary"
-          fullWidth
+          style={{ width: 150 }}
           onClick={() => setGender("female")}
         >
           Female

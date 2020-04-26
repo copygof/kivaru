@@ -139,11 +139,7 @@ const DoctorInfo = (props: DoctorInfoProps) => {
         }}
         variant="dot"
       >
-        <Avatar
-          alt={props.name}
-          className={classes.avatar}
-          src="/static/images/avatar/1.jpg"
-        />
+        <Avatar alt={props.name} className={classes.avatar} src={props.image} />
       </StyledBadge>
       <Box
         display="flex"

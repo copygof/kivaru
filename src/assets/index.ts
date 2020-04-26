@@ -11,4 +11,8 @@ export const ImageSources = {
   DOCTOR_MEDICINE_DISPENSE: require("./images/stethoscope.png"),
   DOCTOR_PRESCRIPTION: require("./images/drug.png"),
   DOCTOR_SKILL: require("./images/doctor-skill.png"),
+  NURSE_NO_REFER: require("./images/emergency-kit.png"),
+  VERY_SEVERE: require("./images/very-severe.png"),
+  NO_PLAN: require("./images/no-plan.png"),
+  MODERATE: require("./images/moderate.png"),
 }

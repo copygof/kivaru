@@ -119,14 +119,14 @@ function UserAttachment() {
   )
 }
 
-function DoctorCheck() {
+function NurseScreening() {
   const history = useHistory()
   const symptom = `My ankle is red and swollen. , I feel itchy on my ankle. ,
   My ankle is stiff and sore`
 
   function handleClickVideoCall() {
     // DoctorMedicalRecordsPage
-    history.push("/doctor/medical-records")
+    history.push("/nurse/refer-process")
   }
 
   return (
@@ -167,14 +167,14 @@ function DoctorCheck() {
   )
 }
 
-const DoctorCheckPage = () => {
+const NurseScreeningPage = () => {
   return (
     <NavbarLayout pageTitle="Check">
       <React.Suspense fallback={<Loading />}>
-        <DoctorCheck />
+        <NurseScreening />
       </React.Suspense>
     </NavbarLayout>
   )
 }
 
-export default DoctorCheckPage
+export default NurseScreeningPage

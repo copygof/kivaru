@@ -24,6 +24,7 @@ export type ItemProps = {
   name: string
   skill: string
   location: string
+  image: string | any
   rating: number
   onClick?: () => void
 }
@@ -35,6 +36,7 @@ function Item(props: ItemProps) {
     <ButtonBase className={classes.item} onClick={props.onClick}>
       <DoctorInfo
         name={props.name}
+        image={props.image}
         skill={props.skill}
         location={props.location}
         rating={props.rating}
@@ -54,12 +56,18 @@ function DoctorList() {
   }
 
   return (
-    <Box display="flex" justifyContent="space-between" flexDirection="column">
+    <Box
+      display="flex"
+      justifyContent="flex-start"
+      // alignItems="center"
+      flexDirection="column"
+    >
       {doctorList.map((doctor: DoctorSchema & UserSchema) => (
         <Item
           key={doctor.id}
           name={`${doctor?.profile?.firstName} ${doctor?.profile?.lastName}`}
-          skill={doctor.specificSkill || "-"}
+          image={doctor.profile.imageProfile}
+          skill={doctor.graduate || "-"}
           location={doctor.hospital || "-"}
           rating={doctor.ratings}
           onClick={handleClickDoctor(doctor.id)}

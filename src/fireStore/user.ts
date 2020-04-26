@@ -1,4 +1,4 @@
-import db from "../config/firestore"
+import db, { storage } from "../config/firestore"
 import {
   snapshotAll,
   snapshotOneOfList,
@@ -6,6 +6,7 @@ import {
   getResultBeforeSnap,
   loggingError,
   loggingSuccess,
+  removeUserNameAndPassword,
 } from "./utils"
 
 export type ProfileSchema = {
@@ -15,7 +16,7 @@ export type ProfileSchema = {
   phoneNumber: string
   dob: Date
   gender: "male" | "female"
-  imageProfile: string
+  imageProfile: string | any
 }
 
 export type AddressSchema = {
@@ -52,10 +53,38 @@ export type UserSchema = {
   account: AccountSchema
 }
 
+export async function uploadImage(image: any) {
+  const storageRef = storage.ref()
+
+  try {
+    const fileName = image?.name || `${Date.now}.jpg`
+    const imageUrl = await storageRef
+      .child(`images/${fileName}`)
+      .put(image)
+      .then((snapshot) => snapshot.ref.getDownloadURL())
+    return imageUrl
+  } catch (error) {
+    console.log("upload image error => ", error)
+    return Promise.reject(error)
+  }
+}
+
 export async function createUser(userData: UserSchema) {
+  let imageProfile = ""
+
+  if (userData.profile?.imageProfile) {
+    imageProfile = await uploadImage(userData.profile?.imageProfile)
+  }
+
   return db
     .collection("users")
-    .add(userData)
+    .add({
+      ...userData,
+      profile: {
+        ...userData.profile,
+        imageProfile,
+      },
+    })
     .then(getResultBeforeSnap)
     .then(snapshotOne)
     .then(loggingSuccess("Create user"))
@@ -80,4 +109,16 @@ export function getUserList() {
     .then(snapshotAll)
     .then(loggingSuccess("Get user list"))
     .catch(loggingError("Get user list"))
+}
+
+export async function getUserById(userId: string) {
+  const userDetail = await db
+    .collection("users")
+    .doc(userId)
+    .get()
+    .then(snapshotOne)
+
+  return {
+    ...removeUserNameAndPassword(userDetail),
+  }
 }
