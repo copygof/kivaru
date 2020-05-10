@@ -15,6 +15,7 @@ import {
 import { useHistory } from "react-router-dom"
 import resource from "../../resource"
 import ErrorBoundary from "../../components/common/ErrorBoundary"
+import fireStore from "../../fireStore"
 
 const useStyles = makeStyles({
   dateCounter: {
@@ -249,22 +250,74 @@ function AppointmentCard(props: {
   )
 }
 
-function AppointmentCardList({ date }: { date: Date }) {
-  const history = useHistory()
-  const bookingList = resource.booking.listRefToDocByDate.read(date)
+function useQueryBookingList(date: Date, isNoRefToDoc: boolean) {
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "failure" | "empty"
+  >("idle")
+  const [bookingList, setBookingList] = useState<any>([])
 
-  // console.log("bookingList => ", bookingList)
-  // console.log("date => ", date)
+  useEffect(() => {
+    async function getBookingList() {
+      try {
+        setStatus("loading")
+        let response
+
+        if (isNoRefToDoc) {
+          response = await fireStore.booking.getAllBookingNoRefToDocByDate(date)
+        } else {
+          response = await fireStore.booking.getAllBookingRefToDocByDate(date)
+        }
+
+        setStatus("success")
+        setBookingList(response)
+      } catch (error) {
+        setStatus("failure")
+        setBookingList([])
+      }
+    }
+
+    getBookingList()
+  }, [date, isNoRefToDoc])
+
+  return { data: bookingList, status }
+}
+
+function AppointmentCardList({
+  date,
+  isNoRefToDoc,
+}: {
+  date: Date
+  isNoRefToDoc: boolean
+}) {
+  const history = useHistory()
+  const { data: bookingList, status } = useQueryBookingList(date, isNoRefToDoc)
 
   function handleClickSelectCase(data: any) {
-    // console.log("data => ", data)
-    // const
     const doctorId = data.doctorId
     const userId = data.userId
     const bookingId = data.id
-    history.push(
-      `/nurse/doctor-finished-checking/${bookingId}/${doctorId}/${userId}`
-    )
+
+    if (data.status === "waitForComplete") {
+      return history.push(
+        `/nurse/doctor-finished-checking/${bookingId}/${doctorId}/${userId}`
+      )
+    }
+
+    return history.push(`/nurse/screening/${bookingId}`)
+  }
+
+  function displayStatus(bookingStatus: string) {
+    // @ts-ignore
+    return {
+      waitForScanning: "scanning",
+      waitForChecking: "scanning",
+      waitForComplete: "checking",
+      complete: "complete",
+    }[bookingStatus]
+  }
+
+  if (status === "loading") {
+    return <Loading />
   }
 
   return (
@@ -275,12 +328,12 @@ function AppointmentCardList({ date }: { date: Date }) {
         flexFlow: "column",
       }}
     >
-      {bookingList.map((data: any) => (
+      {bookingList.map((data: any, index: number) => (
         <AppointmentCard
           key={data.id}
           onClick={() => handleClickSelectCase(data)}
-          number={2}
-          status={"scanning"}
+          number={index + 1}
+          status={displayStatus(data.status)}
           name={`${data.user?.profile?.firstName} ${data.user?.profile?.lastName}`}
           time={moment(data.datetime.seconds * 1000).format("HH:mm")}
         />
@@ -289,7 +342,7 @@ function AppointmentCardList({ date }: { date: Date }) {
   )
 }
 
-function NurseReFer() {
+function NurseReFer({ isNoRefToDoc }: { isNoRefToDoc: boolean }) {
   const history = useHistory()
   const [date, setDate] = useState(new Date())
 
@@ -310,28 +363,29 @@ function NurseReFer() {
           display: "flex",
           height: 77,
           flex: "0 0",
+          marginBottom: 20,
         }}
       >
         <DateCounter onChangeDate={handleChangeDate} />
       </div>
-      <AppointmentCardList date={date} />
-      {/* <ErrorBoundary>
-        <React.Suspense fallback={<Loading />}>
-          <AppointmentCardList date={date} />
-        </React.Suspense>
-      </ErrorBoundary> */}
-
+      <AppointmentCardList date={date} isNoRefToDoc={isNoRefToDoc} />
       {/* <p style={{ fontSize: 20, textAlign: "center" }}>Not found</p> */}
     </div>
   )
 }
 
-export default function NurseReFerPage() {
+export default function NurseReFerPage({
+  isNoRefToDoc,
+}: {
+  isNoRefToDoc: boolean
+}) {
   return (
-    <NavbarLayout pageTitle="Not Refer to Doctor">
+    <NavbarLayout
+      pageTitle={isNoRefToDoc ? "Not Refer to Doctor" : "Refer to Doctor"}
+    >
       <ErrorBoundary>
         <React.Suspense fallback={<Loading />}>
-          <NurseReFer />
+          <NurseReFer isNoRefToDoc={isNoRefToDoc} />
         </React.Suspense>
       </ErrorBoundary>
     </NavbarLayout>

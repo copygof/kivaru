@@ -18,11 +18,12 @@ import PersonIcon from "@material-ui/icons/Person"
 import MenuBox from "../../components/common/MenuBox"
 import { ImageSources } from "../../assets"
 import Banner from "../../components/common/Banner"
+import WrappingVideoCall from "../video/VideoCall"
 
 const useStyles = makeStyles({
   root: {
     position: "fixed",
-    zIndex: 999999,
+    zIndex: 9999,
     bottom: 0,
     right: 0,
     left: 0,

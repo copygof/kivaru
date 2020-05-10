@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import NavbarLayout from "../../components/layout/NavbarLayout"
 import { Loading } from "../../components/common/Loading"
 import DoctorInfo from "../../components/features/doctor/DoctorInfo"
@@ -8,19 +8,89 @@ import { VideoCall } from "@material-ui/icons"
 import MoonLoader from "react-spinners/MoonLoader"
 import resource from "../../resource"
 import fireStore from "../../fireStore"
+import { getDoctorById, getDoctorProfileByUserId } from "../../fireStore/doctor"
+import { useDispatch } from "react-redux"
+import { startFinishingFlow } from "../../redux/nurseFinishing"
+
+function useQueryBookingDetail(bookingId: string) {
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "failure" | "empty"
+  >("idle")
+  const [data, setData] = useState<any>({})
+
+  useEffect(() => {
+    async function getBookingList() {
+      try {
+        setStatus("loading")
+        const response = await fireStore.booking.getBookingById(bookingId || "")
+
+        setStatus("success")
+        setData(response)
+      } catch (error) {
+        setStatus("failure")
+        setData({})
+      }
+    }
+
+    getBookingList()
+  }, [bookingId])
+
+  return { data, status }
+}
+
+// function useDoctorDetail(userId: string) {
+//   const [status, setStatus] = useState<
+//     "idle" | "loading" | "success" | "failure" | "empty"
+//   >("idle")
+//   const [data, setData] = useState<any>({})
+
+//   useEffect(() => {
+//     async function getData() {
+//       try {
+//         setStatus("loading")
+//         const response = await getDoctorProfileByUserId(userId)
+
+//         setStatus("success")
+//         setData(response)
+//       } catch (error) {
+//         setStatus("failure")
+//         setData({})
+//       }
+//     }
+
+//     getData()
+//   }, [userId])
+
+//   return { data, status }
+// }
 
 function NurseDoctorFinishedChecking() {
   const history = useHistory()
+  const dispatch = useDispatch()
   const { bookingId, doctorId, userId } = useParams()
-  const [additionalSymptom, setAdditionalSymptom] = useState("")
-  const [action, setAction] = useState("complete")
+  const [additionalSymptom, setAdditionalSymptom] = useState<string>("")
+  const [action, setAction] = useState<
+    "complete" | "referToDoctor" | "nextAppointment"
+  >("complete")
   const [open, setOpen] = useState(false)
 
-  const userDetail = resource.user.detail.read(userId)
-  const doctorDetail = resource.doctor.detail.read(doctorId)
+  const { data, status } = useQueryBookingDetail(bookingId || "")
+
+  useEffect(() => {
+    if (status === "success") {
+      setAction(data.checkingDetail?.status || "complete")
+      setAdditionalSymptom(data.checkingDetail?.additionalSymptom)
+    }
+  }, [data.checkingDetail, status])
+
+  const userDetail = data.user
+  const doctorDetail = data.doctor
+
+  // console.log("data => ", data)
+  // console.log("doctorDetail => ", doctorDetail)
 
   function handleSelectAction(
-    act: "" | "complete" | "referToDoctor" | "nextAppointment"
+    act: "complete" | "referToDoctor" | "nextAppointment"
   ) {
     return () => {
       setAction(act)
@@ -32,24 +102,60 @@ function NurseDoctorFinishedChecking() {
   }
 
   async function handleSubmit() {
-    try {
-      setOpen(true)
-      const response = await fireStore.booking.updateFinishedChecking({
-        bookingId: bookingId || "",
-        additionalSymptom,
-        // @ts-ignore
-        status: action,
-      })
-      setOpen(false)
+    if (action === "complete") {
+      try {
+        setOpen(true)
+        await fireStore.booking.updateFinishedChecking({
+          doctorId: data.doctorId,
+          bookingId: bookingId || "",
+          status: action,
+          bookingDateTime: data.datetime,
+        })
+        setOpen(false)
 
-      history.replace("/nurse/home")
-    } catch (error) {
-      setOpen(false)
-      console.log("error => ", error)
-      setTimeout(() => {
-        alert("Update failure")
-      }, 1000)
+        history.replace("/nurse/home")
+      } catch (error) {
+        setOpen(false)
+        console.log("error => ", error)
+        setTimeout(() => {
+          alert("Update failure")
+        }, 1000)
+      }
     }
+
+    if (action === "referToDoctor") {
+      dispatch(
+        startFinishingFlow({
+          doctorId: data.doctorId,
+          bookingId: bookingId || "",
+          status: action,
+          bookingDateTime: data.datetime,
+        })
+      )
+      history.replace("/nurse/find-doctor")
+    }
+
+    if (action === "nextAppointment") {
+      dispatch(
+        startFinishingFlow({
+          doctorId: data.doctorId,
+          bookingId: bookingId || "",
+          status: action,
+          bookingDateTime: data.datetime,
+        })
+      )
+      history.replace("/nurse/find-doctor")
+    }
+  }
+
+  function handleClickVideoCall() {
+    const friendName = `${userDetail.profile.firstName} ${userDetail.profile.lastName}`
+    const friendID = userId || ""
+    history.push(`/nurse/video-call/${friendID}/${friendName}`)
+  }
+
+  if (status === "loading") {
+    return <Loading />
   }
 
   return (
@@ -57,10 +163,10 @@ function NurseDoctorFinishedChecking() {
       <Box marginTop={2}>
         <DoctorInfo
           isPreview
-          name={`${doctorDetail.profile?.firstName} ${doctorDetail.profile?.lastName}`}
-          skill={doctorDetail.graduate}
-          location={doctorDetail.hospital}
-          image={doctorDetail.profile.imageProfile}
+          name={`${doctorDetail?.profile?.firstName} ${doctorDetail?.profile?.lastName}`}
+          skill={doctorDetail?.graduate}
+          location={doctorDetail?.hospital}
+          image={doctorDetail?.profile?.imageProfile}
           rating={0}
         />
       </Box>
@@ -74,7 +180,7 @@ function NurseDoctorFinishedChecking() {
             variant="h5"
             component="h4"
           >
-            {`${userDetail.profile.firstName} ${userDetail.profile.lastName}`}
+            {`${userDetail?.profile?.firstName} ${userDetail?.profile?.lastName}`}
           </Typography>
         </Box>
         <Button
@@ -89,7 +195,7 @@ function NurseDoctorFinishedChecking() {
             fontSize: 10,
           }}
         >
-          Complete
+          {data.checkingDetail?.status}
         </Button>
       </Box>
       <Box marginTop={4} display="flex">
@@ -146,6 +252,7 @@ function NurseDoctorFinishedChecking() {
 
       <Box marginTop={2}>
         <TextField
+          disabled
           multiline
           rows={5}
           fullWidth
@@ -165,7 +272,7 @@ function NurseDoctorFinishedChecking() {
           variant="contained"
           color="primary"
           // fullWidth
-          onClick={handleSubmit}
+          onClick={handleClickVideoCall}
           style={{
             width: 160,
             height: 44,

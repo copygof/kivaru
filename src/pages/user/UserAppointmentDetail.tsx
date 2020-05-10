@@ -66,6 +66,8 @@ function BookingList() {
   const userId = useSelector((state: any) => state.auth.userId)
   const bookingList = resource.booking.listByUserId.read(userId)
 
+  // console.log("bookingList => ", bookingList)
+
   function handleClickDoctor(doctorId?: string) {
     return () => {
       // history.push(`/user/doctor-appointment/${doctorId}`)
@@ -78,8 +80,8 @@ function BookingList() {
         <Item
           key={booking.id}
           datetime={booking.datetime?.seconds}
-          fullName={booking.fullName}
-          detail={booking.detail}
+          fullName={`${booking?.doctor?.profile?.firstName} ${booking?.doctor?.profile?.lastName}`}
+          detail={booking.doctor?.graduate}
           onClick={handleClickDoctor(booking.id)}
         />
       ))}

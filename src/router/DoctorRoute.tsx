@@ -9,6 +9,7 @@ import DoctorProfile from "../pages/doctor/DoctorProfilePage"
 import DoctorAppointmentList from "../pages/doctor/DoctorAppointmentList"
 import DoctorCheckPage from "../pages/doctor/DoctorCheckPage"
 import DoctorMedicalRecordsPage from "../pages/doctor/DoctorMedicalRecordsPage"
+import VideoCall from "../pages/video/VideoCall"
 
 export default function DoctorRoute() {
   return (
@@ -28,11 +29,14 @@ export default function DoctorRoute() {
       <PrivateDoctorRoute path="/doctor/appointment">
         <DoctorAppointmentList />
       </PrivateDoctorRoute>
-      <PrivateDoctorRoute path="/doctor/check">
+      <PrivateDoctorRoute path="/doctor/check/:bookingId">
         <DoctorCheckPage />
       </PrivateDoctorRoute>
-      <PrivateDoctorRoute path="/doctor/medical-records">
+      <PrivateDoctorRoute path="/doctor/medical-records/:bookingId">
         <DoctorMedicalRecordsPage />
+      </PrivateDoctorRoute>
+      <PrivateDoctorRoute path="/doctor/video-call/:friendID/:friendName">
+        <VideoCall />
       </PrivateDoctorRoute>
       <Route path="/doctor/profile">
         <DoctorProfile />

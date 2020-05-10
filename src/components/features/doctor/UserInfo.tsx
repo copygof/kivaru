@@ -10,7 +10,7 @@ import {
 import StarRatingComponent from "react-star-rating-component"
 
 export type DoctorInfoProps = {
-  image?: any
+  image?: string
   name: string
   isPreview?: boolean
   date: string
@@ -142,11 +142,7 @@ const UserInfo = (props: DoctorInfoProps) => {
         }}
         variant="dot"
       >
-        <Avatar
-          alt={props.name}
-          className={classes.avatar}
-          src="/static/images/avatar/1.jpg"
-        />
+        <Avatar alt={props.name} className={classes.avatar} src={props.image} />
       </StyledBadge>
       <Box
         display="flex"

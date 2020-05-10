@@ -46,6 +46,7 @@ export type DoctorSchema = {
     day: WorkingDay[]
     time: WorkingTime[]
   }
+  isGeneralDoctor?: boolean
 }
 
 export async function createDoctor(userData: UserSchema) {
@@ -128,6 +129,7 @@ export async function createDoctor(userData: UserSchema) {
         },
       ],
     },
+    isGeneralDoctor: false,
   })
 
   return addResult.get().then(snapshotOne)

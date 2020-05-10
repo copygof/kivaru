@@ -91,8 +91,8 @@ export async function createUser(userData: UserSchema) {
     .catch(loggingError("Create user"))
 }
 
-export function loginWithPhone(phoneNumber: string, password: string) {
-  return db
+export async function loginWithPhone(phoneNumber: string, password: string) {
+  const userDetail = await db
     .collection("users")
     .where("account.userName", "==", phoneNumber)
     .where("account.password", "==", password)
@@ -100,6 +100,8 @@ export function loginWithPhone(phoneNumber: string, password: string) {
     .then(snapshotOneOfList)
     .then(loggingSuccess("Login with phone number"))
     .catch(loggingError("Login with phone number"))
+
+  return removeUserNameAndPassword(userDetail)
 }
 
 export function getUserList() {
@@ -118,7 +120,5 @@ export async function getUserById(userId: string) {
     .get()
     .then(snapshotOne)
 
-  return {
-    ...removeUserNameAndPassword(userDetail),
-  }
+  return removeUserNameAndPassword(userDetail)
 }

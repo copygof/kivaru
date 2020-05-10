@@ -1,26 +1,51 @@
 import React, { useState } from "react"
 import NavbarLayout from "../../components/layout/NavbarLayout"
 import { Loading } from "../../components/common/Loading"
-import { Box, Typography, TextField, Button } from "@material-ui/core"
-import { useHistory } from "react-router-dom"
+import { Box, Typography, TextField, Button, Dialog } from "@material-ui/core"
+import MoonLoader from "react-spinners/MoonLoader"
+
+import { useHistory, useParams } from "react-router-dom"
+import { updateCheckingDetail } from "../../fireStore/booking"
 
 function DoctorMedicalRecords(params: any) {
   const history = useHistory()
+  const { bookingId } = useParams()
   const [additionalSymptom, setAdditionalSymptom] = useState("")
-  const [action, setAction] = useState("complete")
+  const [action, setAction] = useState<
+    "complete" | "referToDoctor" | "nextAppointment"
+  >("complete")
+  const [open, setOpen] = useState(false)
+
+  function handleClose() {
+    setOpen(false)
+  }
 
   function handleSelectAction(
-    act: "complete" | "nextAppointment" | "refToDoctor"
+    act: "complete" | "referToDoctor" | "nextAppointment"
   ) {
     return () => {
       setAction(act)
     }
   }
 
-  function handleSubmit() {
-    // TODO fetch api
+  async function handleSubmit() {
+    try {
+      setOpen(true)
+      await updateCheckingDetail({
+        bookingId: bookingId || "",
+        additionalSymptom,
+        status: action,
+      })
+      setOpen(false)
 
-    history.replace("/doctor/home", 0)
+      history.replace("/doctor/home", 0)
+    } catch (error) {
+      setOpen(false)
+      console.log("error => ", error)
+      setTimeout(() => {
+        alert("failure")
+      }, 1000)
+    }
   }
 
   return (
@@ -68,13 +93,13 @@ function DoctorMedicalRecords(params: any) {
         <Button
           variant="outlined"
           fullWidth
-          onClick={handleSelectAction("refToDoctor")}
+          onClick={handleSelectAction("referToDoctor")}
           style={{
             borderRadius: "100px",
             height: 44,
             border: "1px solid #ECECEC",
             boxShadow: "0px 1px 3px 0px rgba(0, 0, 0, 0.1)",
-            color: action === "refToDoctor" ? "#FF2E29" : "#19769F",
+            color: action === "referToDoctor" ? "#FF2E29" : "#19769F",
             fontWeight: "bold",
           }}
         >
@@ -113,6 +138,9 @@ function DoctorMedicalRecords(params: any) {
           Fisnished
         </Button>
       </Box>
+      <Dialog onClose={handleClose} open={open}>
+        <MoonLoader color="#FF2E29" />
+      </Dialog>
     </div>
   )
 }

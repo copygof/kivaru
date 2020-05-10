@@ -16,6 +16,7 @@ import { NavLink, useHistory } from "react-router-dom"
 import SimpleLayout from "../../components/layout/SimpleLayout"
 import fireStore from "../../fireStore"
 import { login } from "../../redux/auth"
+import { initUser } from "../../redux/user"
 
 const override = css`
   display: block;
@@ -46,6 +47,7 @@ export default function UserLoginPage() {
           userId: response.id,
         })
       )
+      dispatch(initUser(response))
       history.replace("/user/home")
     } catch (error) {
       setOpen(false)

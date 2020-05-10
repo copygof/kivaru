@@ -1,6 +1,12 @@
 import { combineReducers } from "redux"
-import authReducer from "./auth"
+import auth from "./auth"
+import user from "./user"
+import nurseScreening from "./nurseScreening"
+import nurseFinishing from "./nurseFinishing"
 
 export default combineReducers({
-  auth: authReducer,
+  auth,
+  user,
+  nurseScreening,
+  nurseFinishing,
 })

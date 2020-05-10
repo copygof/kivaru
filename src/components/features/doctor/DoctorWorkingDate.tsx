@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import {
   Box,
   ButtonBase,
@@ -150,19 +150,37 @@ export type DoctorWorkingDateProps = {
   isDisabledTime?: boolean
   isDisabledDateList?: boolean
   isDisabledTimeList?: boolean
+  isEnableDefaultDateTime?: boolean
   onClickDate?: (value: any) => void
   onClickTime?: (value: any) => void
   onSelectDay?: (value: any) => void
   onSelectTime?: (value: any) => void
   dayList: any[]
   timeList: any[]
+  selectedDate?: any
+  selectedTime?: any
 }
 
 function DoctorWorkingDate(props: DoctorWorkingDateProps) {
   const classes = useStyles()
 
-  const [selectedDate, setSelectedDate] = React.useState<Date | null>(null)
-  const [selectedTime, setSelectedTime] = React.useState<Date | null>(null)
+  const [selectedDate, setSelectedDate] = React.useState<Date | null>(
+    props.selectedDate || null
+  )
+  const [selectedTime, setSelectedTime] = React.useState<Date | null>(
+    props.selectedTime || null
+  )
+
+  useEffect(() => {
+    if (props.selectedDate) {
+      // @ts-ignore
+      setSelectedDate(props.selectedDate)
+    }
+    if (props.selectedTime) {
+      // @ts-ignore
+      setSelectedTime(props.selectedTime)
+    }
+  }, [props.selectedDate, props.selectedTime])
 
   const handleDateChange = (date: any | null) => {
     setSelectedDate(date)

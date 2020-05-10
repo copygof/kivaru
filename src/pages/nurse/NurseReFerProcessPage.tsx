@@ -1,14 +1,14 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import NavbarLayout from "../../components/layout/NavbarLayout"
 import { Loading } from "../../components/common/Loading"
-import { useHistory } from "react-router-dom"
+import { useHistory, useParams } from "react-router-dom"
 import {
   Box,
   Typography,
   TextField,
   Button,
   FormControl,
-  InputLabel,
+  Dialog,
   Select,
   MenuItem,
   InputBase,
@@ -17,7 +17,12 @@ import {
   createStyles,
   ButtonBase,
 } from "@material-ui/core"
+
+import MoonLoader from "react-spinners/MoonLoader"
 import { ImageSources } from "../../assets"
+import fireStore from "../../fireStore"
+import { useDispatch } from "react-redux"
+import { refToDocPrepared } from "../../redux/nurseScreening"
 
 const BootstrapInput = withStyles((theme: Theme) =>
   createStyles({
@@ -57,14 +62,16 @@ const BootstrapInput = withStyles((theme: Theme) =>
   })
 )(InputBase)
 
-function Evaluation() {
-  const [evaluation, setEvaluation] = useState<
-    "noPlan" | "moderate" | "verySevere"
-  >("noPlan")
-
+function Evaluation({
+  onEvaluation,
+  evaluation,
+}: {
+  onEvaluation: (evaluation: "noPlan" | "moderate" | "verySevere") => void
+  evaluation: "noPlan" | "moderate" | "verySevere"
+}) {
   function handleSelectEvaluation(value: "noPlan" | "moderate" | "verySevere") {
     return () => {
-      setEvaluation(value)
+      onEvaluation(value)
     }
   }
 
@@ -148,15 +155,103 @@ function Evaluation() {
   )
 }
 
+function useQueryBookingDetail(bookingId: string) {
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "failure" | "empty"
+  >("idle")
+  const [data, setData] = useState<any>({})
+
+  useEffect(() => {
+    async function getBookingList() {
+      try {
+        setStatus("loading")
+        const response = await fireStore.booking.getBookingById(bookingId || "")
+
+        setStatus("success")
+        setData(response)
+      } catch (error) {
+        setStatus("failure")
+        setData({})
+      }
+    }
+
+    getBookingList()
+  }, [bookingId])
+
+  return { data, status }
+}
+
 function NurseReFerProcess() {
   const history = useHistory()
+  const dispatch = useDispatch()
+  const { bookingId } = useParams()
   const [additionalSymptom, setAdditionalSymptom] = useState("")
   const [temperature, setTemperature] = useState("")
-  const [action, setAction] = useState("referToDoctor")
+  const [action, setAction] = useState<
+    "noReferToDoctor" | "referToDoctor" | "nextAppointment"
+  >("noReferToDoctor")
+  const [evaluation, setEvaluation] = useState<
+    "noPlan" | "moderate" | "verySevere"
+  >("noPlan")
+  const [open, setOpen] = useState(false)
 
-  function handleSubmit() {
-    // TODO fetch api
-    history.replace("/nurse/home")
+  function handleClose() {
+    setOpen(false)
+  }
+
+  const { data, status } = useQueryBookingDetail(bookingId || "")
+
+  useEffect(() => {
+    if (status === "success") {
+      setAction(data.screeningDetail?.status || "noReferToDoctor")
+      setEvaluation(data.screeningDetail?.evaluation || "noPlan")
+      setTemperature(data.screeningDetail?.temperature || "")
+      setAdditionalSymptom(data.screeningDetail?.nurseComment || "")
+    }
+  }, [data.screeningDetail, status])
+
+  async function handleSubmit() {
+    const requestBody = {
+      doctorId: data.doctorId,
+      bookingId: bookingId || "",
+      status: action,
+      screeningDetail: {
+        evaluation,
+        temperature,
+        nurseComment: additionalSymptom,
+        status: action,
+      },
+      bookingDateTime: data.datetime,
+    }
+
+    if (action === "noReferToDoctor") {
+      try {
+        setOpen(true)
+        await fireStore.booking.updateScreening(requestBody)
+        setOpen(false)
+        history.replace("/nurse/home")
+      } catch (error) {
+        setOpen(false)
+        console.log("error => ", error)
+        setTimeout(() => {
+          alert("Failure")
+        }, 1000)
+      }
+    }
+
+    if (action === "referToDoctor") {
+      dispatch(refToDocPrepared(requestBody))
+      history.replace("/nurse/find-doctor")
+    }
+
+    if (action === "nextAppointment") {
+      dispatch(refToDocPrepared(requestBody))
+      history.replace("/nurse/find-doctor")
+    }
+  }
+
+  if (status === "loading") {
+    return <Loading />
   }
 
   return (
@@ -171,13 +266,14 @@ function NurseReFerProcess() {
             onChange={(e: any) => setAction(e.target?.value || "")}
             input={<BootstrapInput />}
           >
-            <MenuItem value="referToDoctor">Not Refer to Doctor</MenuItem>
-            <MenuItem value="noRefer">Refer to Doctor</MenuItem>
+            <MenuItem value="noReferToDoctor">Not Refer to Doctor</MenuItem>
+            <MenuItem value="referToDoctor">Refer to Doctor</MenuItem>
+            <MenuItem value="nextAppointment">Next Appointment</MenuItem>
           </Select>
         </FormControl>
       </Box>
       <Box marginTop={2}>
-        <Evaluation />
+        <Evaluation onEvaluation={setEvaluation} evaluation={evaluation} />
       </Box>
       <Box marginTop={2}>
         <TextField
@@ -221,6 +317,9 @@ function NurseReFerProcess() {
           Save
         </Button>
       </Box>
+      <Dialog onClose={handleClose} open={open}>
+        <MoonLoader color="#FF2E29" />
+      </Dialog>
     </div>
   )
 }

@@ -2,12 +2,24 @@ import React, { Component } from "react"
 
 type ErrorBoundaryProps = {
   errorText?: string
+  trigger?: any
 }
 
 export default class ErrorBoundary extends Component<ErrorBoundaryProps> {
-  state = { hasError: false }
+  state = { hasError: false, prevTrigger: null }
 
   static propTypes = {}
+
+  static getDerivedStateFromProps(props: any, state: any) {
+    if (props.trigger !== state.prevTrigger) {
+      return {
+        prevTrigger: props.trigger,
+        hasError: false,
+      }
+    }
+
+    return null
+  }
 
   static getDerivedStateFromError(error: any) {
     // Update state so the next render will show the fallback UI.

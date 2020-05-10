@@ -1,5 +1,6 @@
 import { createUser, UserSchema, getUserById } from "./user"
 import db from "../config/firestore"
+import * as firebase from "firebase/app"
 import { type } from "os"
 import {
   snapshotOneOfList,
@@ -64,6 +65,7 @@ export type BookingSchema = {
   datetime: Date
   doctorId: string
   isReferToDoctor: boolean
+  isGeneralDoctor?: boolean
   userId: string
   symptom: string
   dayOfSymptom: number
@@ -73,23 +75,16 @@ export type BookingSchema = {
     evaluation: "noPlan" | "moderate" | "verySevere"
     temperature: string
     nurseComment: string
-    status: "" | "complete" | "referToDoctor" | "nextAppointment"
+    status: "" | "noReferToDoctor" | "referToDoctor" | "nextAppointment"
   }
   checkingDetail: {
     additionalSymptom: string
     status: "" | "complete" | "referToDoctor" | "nextAppointment"
   }
-  doctorFinishedChecking: {
-    additionalSymptom: string
+  nurseFinishedChecking: {
     status: "" | "complete" | "referToDoctor" | "nextAppointment"
   }
-  status:
-    | "waitForScanning"
-    | "scanning"
-    | "waitForChecking"
-    | "checking"
-    | "waitForComplete"
-    | "complete"
+  status: "waitForScanning" | "waitForChecking" | "waitForComplete" | "complete"
   createDate: Date
   updateDate: Date
 }
@@ -101,12 +96,14 @@ export async function createBooking(booking: {
   symptom: BookingSchema["symptom"]
   dayOfSymptom: BookingSchema["dayOfSymptom"]
   attachment: BookingSchema["attachment"]
+  parentId?: BookingSchema["parentId"]
 }) {
   const addResult = await db.collection("booking").add({
-    parentId: "",
+    parentId: booking.parentId || "",
     datetime: booking.datetime,
     doctorId: booking.doctorId,
     isReferToDoctor: !!booking.doctorId,
+    isGeneralDoctor: false,
     userId: booking.userId,
     symptom: booking.symptom,
     dayOfSymptom: booking.dayOfSymptom,
@@ -115,14 +112,13 @@ export async function createBooking(booking: {
       evaluation: "noPlan",
       temperature: "",
       nurseComment: "",
-      status: "",
+      status: "noReferToDoctor",
     },
     checkingDetail: {
       additionalSymptom: "",
       status: "",
     },
-    doctorFinishedChecking: {
-      additionalSymptom: "",
+    nurseFinishedChecking: {
       status: "",
     },
     status: "waitForScanning",
@@ -158,51 +154,183 @@ export async function getBookingByUserId(userId: string) {
   return result
 }
 
-export async function getAllBookingRefToDocByDate(date: Date) {
-  const bookingList = await db
-    .collection("booking")
-    .where("status", "==", "waitForScanning")
-    .where("isReferToDoctor", "==", true)
-    .get()
-    .then(snapshotAll)
-    .then(loggingSuccess("Get booking list by user id"))
-    .catch(loggingError("Get booking list by user id"))
+export async function getAllBookingRefToDocByDate(
+  date: Date,
+  isGeneralDoctor: boolean = false,
+  filterStatus: string[] = ["waitForScanning", "waitForComplete"]
+) {
+  let start = new Date(date)
+  let end = new Date(date)
+  start.setDate(start.getDate() - 1)
+  end.setDate(start.getDate() + 1)
 
-  const result = await Promise.all(
-    bookingList.map(async (booking: BookingSchema) => {
-      const doctor = await getDoctorById(booking.doctorId)
-      const user = await getUserById(booking.userId)
-      return {
-        ...booking,
-        doctor,
-        user,
-      }
-    })
-  )
+  const startDate = firebase.firestore.Timestamp.fromDate(start)
+  const endDate = firebase.firestore.Timestamp.fromDate(end)
 
+  try {
+    const bookingList = await db
+      .collection("booking")
+      .where("datetime", ">", startDate)
+      .where("datetime", "<", endDate)
+      .get()
+      .then(snapshotAll)
+      .then(loggingSuccess("Get booking list by date"))
+      .catch(loggingError("Get booking list by date"))
+
+    if (bookingList) {
+      const result = await Promise.all(
+        bookingList
+          // .filter((bk: any) => bk.isGeneralDoctor === isGeneralDoctor)
+          .filter((bk: any) => bk.isReferToDoctor === true)
+          .filter((bk: any) => filterStatus.includes(bk.status))
+          .map(async (booking: BookingSchema) => {
+            const doctor = await getDoctorById(booking.doctorId)
+            const user = await getUserById(booking.userId)
+            return {
+              ...booking,
+              doctor,
+              user,
+            }
+          })
+      )
+      return result
+    }
+  } catch (error) {
+    return []
+  }
+}
+
+export async function getAllBookingNoRefToDocByDate(date: Date) {
+  const result = await getAllBookingRefToDocByDate(date, true)
   return result
 }
 
-export async function updateFinishedChecking({
+export async function getAllBookingByDocIdAndByDate(
+  doctorId: string,
+  date: Date
+) {
+  const result = await getAllBookingRefToDocByDate(date, false, [
+    "waitForChecking",
+  ])
+  const doctorListById = result?.filter((bkl: any) => bkl.doctorId === doctorId)
+  return doctorListById
+}
+
+export async function getBookingById(bookingId: string) {
+  const bookingDetail = await db
+    .collection("booking")
+    .doc(bookingId)
+    .get()
+    .then(snapshotOne)
+
+  const doctor = await getDoctorById(bookingDetail.doctorId)
+  const user = await getUserById(bookingDetail.userId)
+
+  return {
+    ...bookingDetail,
+    doctor,
+    user,
+  }
+}
+
+export async function updateScreening({
+  doctorId,
+  bookingId,
+  status,
+  screeningDetail,
+  bookingDateTime,
+}: {
+  doctorId?: string
+  bookingId: string
+  status: "noReferToDoctor" | "referToDoctor" | "nextAppointment"
+  screeningDetail: {
+    evaluation: "noPlan" | "moderate" | "verySevere"
+    temperature: string
+    nurseComment: string
+    status: "noReferToDoctor" | "referToDoctor" | "nextAppointment"
+  }
+  bookingDateTime?: BookingSchema["datetime"]
+}) {
+  const caseStatus = status === "referToDoctor" ? "waitForChecking" : "complete"
+
+  const updateResponse = await db
+    .collection("booking")
+    .doc(bookingId)
+    .update({
+      screeningDetail,
+      isReferToDoctor:
+        status === "referToDoctor" || status === "nextAppointment",
+      doctorId,
+      status: caseStatus,
+    })
+    .then(loggingSuccess("Update booking doc by id"))
+    .catch(loggingError("Update booking doc by id"))
+
+  if (status === "nextAppointment" && doctorId) {
+    const bookingDetail = await getBookingById(bookingId)
+    const createBookingResponse = await createBooking({
+      ...bookingDetail,
+      parentId: bookingDetail.parentId,
+      doctorId,
+      datetime: bookingDateTime || new Date(),
+    })
+
+    return createBookingResponse
+  }
+
+  return updateResponse
+}
+
+export async function updateCheckingDetail({
   bookingId,
   additionalSymptom,
   status,
 }: {
-  doctorId: string
   bookingId: string
   additionalSymptom: string
-  status: "" | "complete" | "referToDoctor" | "nextAppointment"
+  status: "complete" | "referToDoctor" | "nextAppointment"
 }) {
   const updateResponse = await db
     .collection("booking")
     .doc(bookingId)
     .update({
-      "doctorFinishedChecking.additionalSymptom": additionalSymptom,
-      "doctorFinishedChecking.status": status,
-      status: "complete",
+      "checkingDetail.additionalSymptom": additionalSymptom,
+      "checkingDetail.status": status,
+      status: "waitForComplete",
     })
     .then(loggingSuccess("Update booking doc by id"))
     .catch(loggingError("Update booking doc by id"))
+
+  return updateResponse
+}
+
+export async function updateFinishedChecking({
+  doctorId,
+  bookingId,
+  status,
+  bookingDateTime,
+}: {
+  doctorId?: string
+  bookingId: string
+  status: "complete" | "referToDoctor" | "nextAppointment"
+  bookingDateTime?: BookingSchema["datetime"]
+}) {
+  const updateResponse = await db.collection("booking").doc(bookingId).update({
+    "nurseFinishedChecking.status": status,
+    status: "complete",
+  })
+
+  if (status !== "complete") {
+    const bookingDetail = await getBookingById(bookingId)
+    const createBookingResponse = await createBooking({
+      ...bookingDetail,
+      parentId: bookingDetail.parentId,
+      doctorId,
+      datetime: bookingDateTime || new Date(),
+    })
+
+    return createBookingResponse
+  }
 
   return updateResponse
 }

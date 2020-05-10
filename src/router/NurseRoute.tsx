@@ -11,6 +11,9 @@ import NurseScreeningPage from "../pages/nurse/NurseScreeningPage"
 import NurseReFerProcessPage from "../pages/nurse/NurseReFerProcessPage"
 import NurseReFerPage from "../pages/nurse/NurseReFerPage"
 import NurseDoctorFinishedCheckingPage from "../pages/nurse/NurseDoctorFinishedCheckingPage"
+import VideoCall from "../pages/video/VideoCall"
+import NurseFindDoctor from "../pages/nurse/NurseFindDoctor"
+import NurseAppointment from "../pages/nurse/NurseAppointment"
 
 export default function NurseRoute() {
   return (
@@ -27,17 +30,26 @@ export default function NurseRoute() {
       <PrivateNurseRoute path="/nurse/home">
         <NurseHomePage />
       </PrivateNurseRoute>
-      <PrivateNurseRoute path="/nurse/no-refer">
-        <NurseNoReFerPage />
-      </PrivateNurseRoute>
-      <PrivateNurseRoute path="/nurse/refer-process">
+      <PrivateNurseRoute path="/nurse/refer-process/:bookingId">
         <NurseReFerProcessPage />
       </PrivateNurseRoute>
       <PrivateNurseRoute path="/nurse/refer-to-doctor">
-        <NurseReFerPage />
+        <NurseReFerPage isNoRefToDoc={false} />
       </PrivateNurseRoute>
-      <PrivateNurseRoute path="/nurse/screening">
+      <PrivateNurseRoute path="/nurse/no-refer">
+        <NurseReFerPage isNoRefToDoc />
+      </PrivateNurseRoute>
+      <PrivateNurseRoute path="/nurse/screening/:bookingId">
         <NurseScreeningPage />
+      </PrivateNurseRoute>
+      <PrivateNurseRoute path="/nurse/find-doctor">
+        <NurseFindDoctor />
+      </PrivateNurseRoute>
+      <PrivateNurseRoute path="/nurse/doctor-appointment/:id">
+        <NurseAppointment />
+      </PrivateNurseRoute>
+      <PrivateNurseRoute path="/nurse/video-call/:friendID/:friendName">
+        <VideoCall />
       </PrivateNurseRoute>
       <PrivateNurseRoute path="/nurse/doctor-finished-checking/:bookingId/:doctorId/:userId">
         <NurseDoctorFinishedCheckingPage />

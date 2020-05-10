@@ -14,6 +14,7 @@ import {
 } from "@material-ui/icons"
 import { useHistory } from "react-router-dom"
 import resource from "../../resource"
+import fireStore from "../../fireStore"
 
 const useStyles = makeStyles({
   dateCounter: {
@@ -185,6 +186,8 @@ function AppointmentCheckStatus(props: {
 function AppointmentCard(props: {
   number: number
   status: "next" | "checking" | "scanning"
+  name: string
+  time: string
   onClick: () => void
 }) {
   const classes = useStyles()
@@ -226,10 +229,10 @@ function AppointmentCard(props: {
         </div>
 
         <div className={classes.appointmentContent}>
-          <p className={classes.appointmentContentTextTitle}>
-            Preecha Sattabut
+          <p className={classes.appointmentContentTextTitle}>{props.name}</p>
+          <p className={classes.appointmentContentTextDescription}>
+            {props.time}
           </p>
-          <p className={classes.appointmentContentTextDescription}>08:00 </p>
         </div>
         <div
           style={{
@@ -246,11 +249,51 @@ function AppointmentCard(props: {
   )
 }
 
-function AppointmentCardList() {
+function useQueryBookingList(date: Date) {
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "failure" | "empty"
+  >("idle")
+  const [bookingList, setBookingList] = useState<any>([])
+
+  useEffect(() => {
+    async function getBookingList() {
+      try {
+        setStatus("loading")
+        const response = await fireStore.booking.getAllBookingNoRefToDocByDate(
+          date
+        )
+        setStatus("success")
+        setBookingList(response)
+      } catch (error) {
+        setStatus("failure")
+        setBookingList([])
+      }
+    }
+
+    getBookingList()
+  }, [date])
+
+  return { data: bookingList, status }
+}
+
+function AppointmentCardList({ date }: { date: Date }) {
   const history = useHistory()
-  function handleClickSelectCase() {
-    history.push("/nurse/screening")
+  const { data: bookingList, status } = useQueryBookingList(date)
+
+  function handleClickSelectCase(data: any) {
+    const doctorId = data.doctorId
+    const userId = data.userId
+    const bookingId = data.id
+    history.push(
+      `/nurse/doctor-finished-checking/${bookingId}/${doctorId}/${userId}`
+    )
+    // history.push("/nurse/screening")
   }
+
+  if (status === "loading") {
+    return <Loading />
+  }
+
   return (
     <div
       style={{
@@ -259,21 +302,16 @@ function AppointmentCardList() {
         flexFlow: "column",
       }}
     >
-      <AppointmentCard
-        onClick={() => handleClickSelectCase()}
-        number={2}
-        status="next"
-      />
-      <AppointmentCard
-        onClick={() => handleClickSelectCase()}
-        number={2}
-        status="checking"
-      />
-      <AppointmentCard
-        onClick={() => handleClickSelectCase()}
-        number={2}
-        status="scanning"
-      />
+      {bookingList.map((data: any) => (
+        <AppointmentCard
+          key={data.id}
+          onClick={() => handleClickSelectCase(data)}
+          number={2}
+          status={"scanning"}
+          name={`${data.user?.profile?.firstName} ${data.user?.profile?.lastName}`}
+          time={moment(data.datetime.seconds * 1000).format("HH:mm")}
+        />
+      ))}
     </div>
   )
 }
@@ -302,7 +340,7 @@ function NurseNoReFer() {
       >
         <DateCounter onChangeDate={handleChangeDate} />
       </div>
-      <AppointmentCardList />
+      <AppointmentCardList date={date} />
       {/* <p style={{ fontSize: 20, textAlign: "center" }}>Not found</p> */}
     </div>
   )

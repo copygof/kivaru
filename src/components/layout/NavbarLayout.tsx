@@ -13,11 +13,13 @@ import Backspace from "@material-ui/icons/ArrowBack"
 export type NavbarLayoutProps = {
   pageTitle: string
   children: ReactChild
+  disabledShadow?: boolean
 }
 
 export default function NavbarLayout({
   pageTitle,
   children,
+  disabledShadow,
 }: NavbarLayoutProps) {
   let history = useHistory()
 
@@ -27,8 +29,20 @@ export default function NavbarLayout({
 
   return (
     <React.Fragment>
-      <AppBar position="fixed">
-        <Toolbar>
+      <AppBar
+        position="fixed"
+        {...(disabledShadow && {
+          style: {
+            boxShadow: "0px 0px transparent",
+          },
+        })}
+      >
+        <Toolbar
+          style={{
+            // backgroundImage: "linear-gradient(to bottom, #FF2A2A , #FF5D2A)",
+            // backgroundImage: "linear-gradient(to bottom, #FF2A2A , #FF5D2A)",
+          }}
+        >
           <IconButton
             edge="start"
             color="inherit"

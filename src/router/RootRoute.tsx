@@ -10,6 +10,7 @@ import DoctorRoute from "./DoctorRoute"
 import { CSSTransition, TransitionGroup } from "react-transition-group"
 import UserSelector from "../pages/user/UserSelector"
 import NurseRoute from "./NurseRoute"
+// import App from "../pages/vldeo/App"
 
 export default function RootRoute() {
   // let location = useLocation()
@@ -41,6 +42,9 @@ export default function RootRoute() {
             <Route path="/test">
               <p>Not test</p>
             </Route>
+            {/* <Route path="/video-call">
+              <App />
+            </Route> */}
             <Route path="*">
               <p>Not found</p>
             </Route>

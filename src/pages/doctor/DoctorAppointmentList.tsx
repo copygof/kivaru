@@ -13,6 +13,11 @@ import {
   Person,
 } from "@material-ui/icons"
 import { useHistory } from "react-router-dom"
+import fireStore from "../../fireStore"
+import UserSelector from "../user/UserSelector"
+import { userIdSelector } from "../../redux/user"
+import { useSelector } from "react-redux"
+import { getDoctorProfileByUserId } from "../../fireStore/doctor"
 
 const useStyles = makeStyles({
   dateCounter: {
@@ -133,7 +138,7 @@ function DateCounter(props: DateCounterProps) {
   }
   function handleDecrease() {
     const prevDate = new Date(date)
-    prevDate.setDate(date.getDate() -  1)
+    prevDate.setDate(date.getDate() - 1)
     setDate(prevDate)
   }
 
@@ -184,6 +189,8 @@ function AppointmentCheckStatus(props: {
 function AppointmentCard(props: {
   number: number
   status: "next" | "checking" | "scanning"
+  name: string
+  time: string
   onClick: () => void
 }) {
   const classes = useStyles()
@@ -225,10 +232,10 @@ function AppointmentCard(props: {
         </div>
 
         <div className={classes.appointmentContent}>
-          <p className={classes.appointmentContentTextTitle}>
-            Preecha Sattabut
+          <p className={classes.appointmentContentTextTitle}>{props.name}</p>
+          <p className={classes.appointmentContentTextDescription}>
+            {props.time}
           </p>
-          <p className={classes.appointmentContentTextDescription}>08:00 </p>
         </div>
         <div
           style={{
@@ -245,16 +252,96 @@ function AppointmentCard(props: {
   )
 }
 
+function useQueryBookingList(date: Date) {
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "failure" | "empty"
+  >("idle")
+  const [bookingList, setBookingList] = useState<any>([])
+  const userId = useSelector(userIdSelector)
+
+  useEffect(() => {
+    async function getBookingList() {
+      try {
+        setStatus("loading")
+        const doctorDetail = await getDoctorProfileByUserId(userId)
+        let response = await fireStore.booking.getAllBookingByDocIdAndByDate(
+          doctorDetail.id,
+          date
+        )
+        setStatus("success")
+        setBookingList(response)
+      } catch (error) {
+        setStatus("failure")
+        setBookingList([])
+      }
+    }
+
+    getBookingList()
+  }, [date, userId])
+
+  return { data: bookingList, status }
+}
+
+function AppointmentCardList({ date }: { date: Date }) {
+  const history = useHistory()
+  const { data: bookingList, status } = useQueryBookingList(date)
+
+  function handleClickSelectCase(data: any) {
+    const doctorId = data.doctorId
+    const userId = data.userId
+    const bookingId = data.id
+
+    // if (data.status === "waitForComplete") {
+    //   return history.push(
+    //     `/nurse/doctor-finished-checking/${bookingId}/${doctorId}/${userId}`
+    //   )
+    // }
+
+    return history.push(`/doctor/check/${bookingId}`)
+  }
+
+  function displayStatus(bookingStatus: string) {
+    // @ts-ignore
+    return {
+      waitForScanning: "scanning",
+      waitForChecking: "scanning",
+      waitForComplete: "checking",
+      complete: "complete",
+    }[bookingStatus]
+  }
+
+  if (status === "loading") {
+    return <Loading />
+  }
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        // flex: "none",
+        flexFlow: "column",
+      }}
+    >
+      {bookingList.map((data: any, index: number) => (
+        <AppointmentCard
+          key={data.id}
+          onClick={() => handleClickSelectCase(data)}
+          number={index + 1}
+          status={displayStatus(data.status)}
+          name={`${data.user?.profile?.firstName} ${data.user?.profile?.lastName}`}
+          time={moment(data.datetime.seconds * 1000).format("HH:mm")}
+        />
+      ))}
+    </div>
+  )
+}
+
 function DoctorAppointmentListFetcher() {
   const history = useHistory()
   const [date, setDate] = useState(new Date())
 
   function handleChangeDate(dat: Date) {
     setDate(dat)
-  }
-
-  function handleClickSelectCase() {
-    history.push("/doctor/check")
   }
 
   return (
@@ -270,38 +357,16 @@ function DoctorAppointmentListFetcher() {
           display: "flex",
           height: 77,
           flex: "0 0",
+          marginBottom: 30,
         }}
       >
         <DateCounter onChangeDate={handleChangeDate} />
       </div>
-      <div
-        style={{
-          display: "flex",
-          // flex: "none",
-          flexFlow: "column",
-        }}
-      >
-        <AppointmentCard
-          onClick={() => handleClickSelectCase()}
-          number={2}
-          status="next"
-        />
-        <AppointmentCard
-          onClick={() => handleClickSelectCase()}
-          number={2}
-          status="checking"
-        />
-        <AppointmentCard
-          onClick={() => handleClickSelectCase()}
-          number={2}
-          status="scanning"
-        />
-      </div>
+      <AppointmentCardList date={date} />
       {/* <p style={{ fontSize: 20, textAlign: "center" }}>Not found</p> */}
     </div>
   )
 }
-
 export default function DoctorAppointmentList() {
   return (
     <NavbarLayout pageTitle="Appointment List">
