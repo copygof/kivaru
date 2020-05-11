@@ -11,6 +11,7 @@ import { DoctorSchema } from "../../fireStore/doctor"
 import { UserSchema } from "../../fireStore/user"
 import { useHistory } from "react-router-dom"
 import { Loading } from "../../components/common/Loading"
+import { useDoctorList } from "../nurse/NurseFindDoctor"
 
 const useStyle = makeStyles({
   item: {
@@ -45,14 +46,19 @@ function Item(props: ItemProps) {
   )
 }
 
+
 function DoctorList() {
   const history = useHistory()
-  const doctorList = resource.doctor.list.read()
+  const { data: doctorList, status } = useDoctorList()
 
   function handleClickDoctor(doctorId?: string) {
     return () => {
       history.push(`/user/doctor-appointment/${doctorId}`)
     }
+  }
+
+  if (status === "loading") {
+    return <Loading />
   }
 
   return (

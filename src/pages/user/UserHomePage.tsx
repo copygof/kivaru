@@ -31,6 +31,8 @@ import { OfflinePin, SettingsPower } from "@material-ui/icons"
 import { useDispatch } from "react-redux"
 import { logout } from "../../redux/auth"
 import { clearUser } from "../../redux/user"
+import UserAppointmentDetail from "./UserAppointmentDetail"
+import UserProfileById from "../../components/features/UserProfileById"
 
 const useStyles = makeStyles({
   root: {
@@ -73,6 +75,7 @@ function TabHome() {
       display="flex"
       justifyContent="space-between"
       alignItems="center"
+      marginTop={10}
     >
       <Box
         flex={1}
@@ -153,12 +156,14 @@ export default function HomePage() {
       <Container
         maxWidth="sm"
         style={{
-          paddingTop: 100,
-          paddingBottom: 100,
+          // paddingTop: 100,
+          // paddingBottom: 100,
           display: "flex",
         }}
       >
         {value === 0 && <TabHome />}
+        {value === 1 && <UserAppointmentDetail />}
+        {value === 2 && <UserProfileById />}
       </Container>
       <BottomNavigation
         value={value}
@@ -187,6 +192,7 @@ export default function HomePage() {
               <ListItemText primary="ออกจากระบบ" />
             </ListItem>
           </List>
+          <Divider />
         </div>
       </Drawer>
     </Box>

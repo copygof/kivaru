@@ -75,7 +75,7 @@ export function useDoctorList() {
         setData(response)
       } catch (error) {
         setStatus("failure")
-        setData({})
+        setData([])
       }
     }
 

@@ -12,9 +12,9 @@ import {
 export type ProfileSchema = {
   firstName: string
   lastName: string
-  email: string
+  email?: string
   phoneNumber: string
-  dob: Date
+  dob?: Date
   gender: "male" | "female"
   imageProfile: string | any
 }
@@ -101,6 +101,36 @@ export async function createUser(userData: UserSchema) {
     .then(snapshotOne)
     .then(loggingSuccess("Create user"))
     .catch(loggingError("Create user"))
+}
+
+export async function updateProfile(profile: ProfileSchema, userId: string) {
+  let imageProfile = ""
+
+  const userDetail: UserSchema = await getUserById(userId)
+  const isImageProfileChanged =
+    profile.imageProfile &&
+    userDetail.profile.imageProfile !== profile.imageProfile
+
+  if (isImageProfileChanged) {
+    imageProfile = await uploadImage(profile.imageProfile)
+  }
+
+  await db
+    .collection("users")
+    .doc(userId)
+    .update({
+      "profile.firstName": profile.firstName,
+      "profile.lastName": profile.lastName,
+      "profile.phoneNumber": profile.phoneNumber,
+      "profile.gender": profile.gender,
+      ...(isImageProfileChanged && {
+        "profile.imageProfile": imageProfile,
+      }),
+    })
+    .then(loggingSuccess("Update user"))
+    .catch(loggingError("Update user"))
+
+  return getUserById(userId)
 }
 
 export async function loginWithPhone(

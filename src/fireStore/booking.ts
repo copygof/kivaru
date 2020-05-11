@@ -151,7 +151,13 @@ export async function getBookingByUserId(userId: string) {
     })
   )
 
-  return result
+  return result.sort(
+    (a: any, b: any) =>
+      // @ts-ignore
+      new Date(moment(b.datetime?.seconds * 1000).toDate()).getTime() -
+      // @ts-ignore
+      new Date(moment(a.datetime?.seconds * 1000).toDate()).getTime()
+  )
 }
 
 export async function getAllBookingRefToDocByDate(

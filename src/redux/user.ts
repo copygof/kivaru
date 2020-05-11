@@ -48,18 +48,25 @@ const userSlice = createSlice({
     initUser(state, action) {
       return action.payload
     },
+    updateUser(state, action) {
+      return {
+        ...state,
+        ...action.payload,
+      }
+    },
     clearUser() {
       return initialStateUser
     },
   },
 })
 
-export const { initUser, clearUser } = userSlice.actions
+export const { initUser, clearUser, updateUser } = userSlice.actions
 
 export const fullNameSelector = (state: any) =>
   `${state.user.profile.firstName} ${state.user.profile.lastName}`
 
 export const userIdSelector = (state: any) => state.user.id
 export const userIsRememberSelector = (state: any) => state.user.isRemember
+export const userProfileSelector = (state: any) => state.user.profile
 
 export default userSlice.reducer

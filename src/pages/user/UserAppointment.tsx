@@ -6,7 +6,12 @@ import resource from "../../resource"
 import { useSelector } from "react-redux"
 import DoctorWorkingDate from "../../components/features/doctor/DoctorWorkingDate"
 import MoonLoader from "react-spinners/MoonLoader"
-import { DoctorSchema, WorkingDay, WorkingTime } from "../../fireStore/doctor"
+import {
+  DoctorSchema,
+  WorkingDay,
+  WorkingTime,
+  getDoctorById,
+} from "../../fireStore/doctor"
 
 import { Button, Dialog } from "@material-ui/core"
 import fireStore from "../../fireStore"
@@ -77,10 +82,10 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
     >
       <DoctorInfo
         isPreview
-        name={`${doctorDetail.profile?.firstName} ${doctorDetail.profile?.lastName}`}
-        skill={doctorDetail.graduate}
-        location={doctorDetail.hospital}
-        image={doctorDetail.profile.imageProfile}
+        name={`${doctorDetail?.profile?.firstName} ${doctorDetail?.profile?.lastName}`}
+        skill={doctorDetail?.graduate}
+        location={doctorDetail?.hospital}
+        image={doctorDetail?.profile?.imageProfile}
         rating={0}
       />
       <DoctorWorkingDate
@@ -104,12 +109,39 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
   )
 }
 
+export function useDoctorDetail(doctorId: string) {
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "failure" | "empty"
+  >("idle")
+  const [data, setData] = useState<any>({})
+
+  useEffect(() => {
+    async function getDoctorDetail() {
+      try {
+        setStatus("loading")
+        const response = await getDoctorById(doctorId)
+
+        setStatus("success")
+        setData(response)
+      } catch (error) {
+        setStatus("failure")
+        setData({})
+      }
+    }
+
+    getDoctorDetail()
+  }, [doctorId])
+
+  return { data, status }
+}
+
 function DoctorProfileFetcher() {
   const { id } = useParams()
+  const { data: doctorDetail, status } = useDoctorDetail(id || "")
 
-  const doctorDetail: DoctorSchema & UserSchema = resource.doctor.detail.read(
-    id
-  )
+  if (status === "loading") {
+    return <Loading />
+  }
 
   return <DoctorProfile doctorDetail={doctorDetail} />
 }

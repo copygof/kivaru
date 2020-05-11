@@ -13,18 +13,29 @@ import fireStore from "../../../fireStore"
 import { storage } from "../../../config/firestore"
 
 export type SignUpFormProps = {
+  initialValues?: {
+    phone: string
+    firstName: string
+    lastName: string
+    password: string
+    gender: string
+    image: string
+  }
+  isEditing?: boolean
   onSubmit: (value: any) => void
 }
 
 export default function SignUpForm(props: SignUpFormProps) {
-  const [phone, setPhone] = useState("")
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [password, setPassword] = useState("")
-  const [gender, setGender] = useState("male")
+  const [phone, setPhone] = useState(props?.initialValues?.phone || "")
+  const [firstName, setFirstName] = useState(
+    props?.initialValues?.firstName || ""
+  )
+  const [lastName, setLastName] = useState(props?.initialValues?.lastName || "")
+  const [password, setPassword] = useState(props?.initialValues?.password || "")
+  const [gender, setGender] = useState(props?.initialValues?.gender || "male")
   const [lang, setLang] = useState("en")
   const [image, setImage] = useState({
-    filePath: "",
+    filePath: props?.initialValues?.image || "",
     rawImage: null,
   })
 
@@ -62,13 +73,9 @@ export default function SignUpForm(props: SignUpFormProps) {
 
   return (
     <>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="flex-start"
-      >
-        <Box display="flex">
-          {/* <ButtonGroup
+      <Box display="flex" justifyContent="center" alignItems="flex-start">
+        {/* <Box display="flex">
+          <ButtonGroup
             color="primary"
             aria-label="outlined primary button group"
           >
@@ -90,9 +97,9 @@ export default function SignUpForm(props: SignUpFormProps) {
             >
               EN
             </Button>
-          </ButtonGroup> */}
-        </Box>
-        <Box display="flex" justifyContent="flex-end">
+          </ButtonGroup>
+        </Box> */}
+        <Box display="flex" justifyContent="center">
           <input
             type="file"
             onChange={handleImageAsFile}
@@ -112,8 +119,8 @@ export default function SignUpForm(props: SignUpFormProps) {
               >
                 <Avatar
                   style={{
-                    width: 77,
-                    height: 77,
+                    width: 130,
+                    height: 130,
                   }}
                   src={image.filePath || ""}
                 ></Avatar>
@@ -122,12 +129,20 @@ export default function SignUpForm(props: SignUpFormProps) {
           </label>
         </Box>
       </Box>
-      <Box marginTop={2} display="flex">
-        <Typography variant="h4" component="h4" color="primary">
-          สมัครสมาชิก
+      <Box
+        marginTop={2}
+        display="flex"
+        justifyContent={props.isEditing ? "center" : "flex-start"}
+      >
+        <Typography
+          variant={props.isEditing ? "h5" : "h4"}
+          component={props.isEditing ? "h5" : "h4"}
+          color="primary"
+        >
+          {props.isEditing ? "ข้อมูลส่วนตัว" : "สมัครสมาชิก"}
         </Typography>
       </Box>
-      <Box marginTop={2}>
+      <Box marginTop={props.isEditing ? 5 : 2}>
         <TextField
           fullWidth
           id="outlined-phonne-input"
@@ -136,6 +151,7 @@ export default function SignUpForm(props: SignUpFormProps) {
           variant="outlined"
           value={phone}
           onChange={handleOnChange("phone")}
+          disabled={props.isEditing}
         />
       </Box>
       <Box marginTop={2}>
@@ -160,17 +176,19 @@ export default function SignUpForm(props: SignUpFormProps) {
           onChange={handleOnChange("lastName")}
         />
       </Box>
-      <Box marginTop={2}>
-        <TextField
-          fullWidth
-          id="outlined-password-input"
-          label="รหัสผ่าน"
-          type="password"
-          variant="outlined"
-          value={password}
-          onChange={handleOnChange("password")}
-        />
-      </Box>
+      {!props.isEditing && (
+        <Box marginTop={2}>
+          <TextField
+            fullWidth
+            id="outlined-password-input"
+            label="รหัสผ่าน"
+            type="password"
+            variant="outlined"
+            value={password}
+            onChange={handleOnChange("password")}
+          />
+        </Box>
+      )}
       {/* <Box marginTop={2}>
         <TextField
           fullWidth
@@ -202,7 +220,7 @@ export default function SignUpForm(props: SignUpFormProps) {
         </Button>
       </Box>
 
-      <Box marginTop={4} display="flex">
+      <Box marginTop={props.isEditing ? 2 : 4} display="flex">
         <Button
           variant="contained"
           color="primary"
@@ -210,7 +228,7 @@ export default function SignUpForm(props: SignUpFormProps) {
           type="submit"
           onClick={handleSubmit}
         >
-          สมัครสมาชิก
+          {props.isEditing ? "บันทึก" : "สมัครสมาชิก"}
         </Button>
       </Box>
     </>
