@@ -69,11 +69,11 @@ const UserSymptomPage = () => {
   }
 
   return (
-    <NavbarLayout pageTitle="Symptom">
+    <NavbarLayout pageTitle="อาการเบื้องต้น">
       <>
         <Box marginTop={2} display="flex">
           <Typography variant="h4" component="h4" color="primary">
-            Symptom
+            อาการเบื้องต้น
           </Typography>
         </Box>
         <Box marginTop={2}>
@@ -82,7 +82,7 @@ const UserSymptomPage = () => {
             rows={5}
             fullWidth
             id="outlined-password-input"
-            label="Additional symptom"
+            label="โปรดระบุอาการเบื้องต้น"
             type="textArea"
             variant="outlined"
             value={symptom}
@@ -91,7 +91,7 @@ const UserSymptomPage = () => {
         </Box>
         <Box marginTop={2} display="flex">
           <Typography variant="h5" component="h4">
-            How many days?
+            ระยะเวลาที่มีอาการ ?
           </Typography>
         </Box>
         <Box
@@ -118,7 +118,7 @@ const UserSymptomPage = () => {
         </Box>
         <Box marginTop={2} display="flex" />
         <Button variant="contained" color="primary" onClick={handleSubmit}>
-          Book Appointment
+          นัดตรวจ
         </Button>
         <Dialog onClose={handleClose} open={open}>
           <MoonLoader color="#FF2E29" />

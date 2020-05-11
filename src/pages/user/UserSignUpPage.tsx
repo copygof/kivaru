@@ -66,7 +66,7 @@ const UserSignUpPage = () => {
   }
 
   return (
-    <NavbarLayout pageTitle="Sign up">
+    <NavbarLayout pageTitle="สมัครสมาชิกใหม่">
       <div>
         <SignUpForm onSubmit={handleSubmit} />
         <Dialog onClose={handleClose} open={open}>

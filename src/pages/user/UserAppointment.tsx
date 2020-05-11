@@ -95,7 +95,7 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
       />
       <DoctorSpecial skill={doctorDetail.specificSkill} />
       <Button variant="contained" color="primary" onClick={onSubmit}>
-        Appointment
+        ระบุวันที่นัดหมาย
       </Button>
       <Dialog onClose={handleClose} open={open}>
         <MoonLoader color="#FF2E29" />
@@ -116,7 +116,7 @@ function DoctorProfileFetcher() {
 
 const UserAppointment = () => {
   return (
-    <NavbarLayout pageTitle="Doctor Details">
+    <NavbarLayout pageTitle="รายละเอียดหมอ">
       <React.Suspense fallback={<Loading />}>
         <DoctorProfileFetcher />
       </React.Suspense>

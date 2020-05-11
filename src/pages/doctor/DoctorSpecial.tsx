@@ -38,7 +38,7 @@ export default function DoctorSpecial(props: DoctorSpecialProps) {
         alt="doctor-skill-icon"
       />
       <p className={classes.textHightLight}>
-        Specialities : <span className={classes.text}>{props.skill}</span>
+        ความชำนาญ : <span className={classes.text}>{props.skill}</span>
       </p>
     </div>
   )

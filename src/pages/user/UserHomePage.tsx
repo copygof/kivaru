@@ -82,16 +82,16 @@ function TabHome() {
         flexWrap="wrap"
       >
         <MenuBox
-          title="Find Doctor"
+          title="เลือกปรึกษาแพทย์"
           image={ImageSources.DOCTOR}
           onClick={handleMenu("findDoctor")}
         />
         <MenuBox
-          title="Appointments"
+          title="ตารางนัดตรวจ"
           image={ImageSources.APPOINTMENTS}
           onClick={handleMenu("appointments")}
         />
-        <MenuBox
+        {/* <MenuBox
           title="Medicine Dispense"
           image={ImageSources.MEDICINE_DISPENSE}
           onClick={handleMenu("medicineDispense")}
@@ -110,7 +110,7 @@ function TabHome() {
           title="Catch Up"
           image={ImageSources.CATCH_UP}
           onClick={handleMenu("catchUp")}
-        />
+        /> */}
       </Box>
       <Banner image={ImageSources.BANNER_1} />
     </Box>
@@ -147,7 +147,7 @@ export default function HomePage() {
           >
             <Menu />
           </IconButton>
-          <Typography variant="h6">Home</Typography>
+          <Typography variant="h6">หน้าแรก</Typography>
         </Toolbar>
       </AppBar>
       <Container
@@ -168,23 +168,23 @@ export default function HomePage() {
         showLabels
         className={classes.root}
       >
-        <BottomNavigationAction label="Home" icon={<HomeIcon />} />
+        <BottomNavigationAction label="หน้าแรก" icon={<HomeIcon />} />
         <BottomNavigationAction
-          label="Appointment"
+          label="ตารางนัดตรวจ"
           icon={<CalendarTodayIcon />}
         />
-        <BottomNavigationAction label="Profile" icon={<PersonIcon />} />
+        <BottomNavigationAction label="โปรไฟล์" icon={<PersonIcon />} />
       </BottomNavigation>
       <Drawer open={isDrawerVisible} onClose={toggleDrawer}>
         <div role="presentation">
-          <div style={{ height: 80 }} />
+          {/* <div style={{ height: 80 }} /> */}
           <Divider />
           <List>
             <ListItem button onClick={handleLogout}>
               <ListItemIcon>
                 <SettingsPower />
               </ListItemIcon>
-              <ListItemText primary="Logout" />
+              <ListItemText primary="ออกจากระบบ" />
             </ListItem>
           </List>
         </div>

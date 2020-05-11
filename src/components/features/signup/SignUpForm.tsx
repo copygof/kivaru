@@ -68,7 +68,7 @@ export default function SignUpForm(props: SignUpFormProps) {
         alignItems="flex-start"
       >
         <Box display="flex">
-          <ButtonGroup
+          {/* <ButtonGroup
             color="primary"
             aria-label="outlined primary button group"
           >
@@ -90,7 +90,7 @@ export default function SignUpForm(props: SignUpFormProps) {
             >
               EN
             </Button>
-          </ButtonGroup>
+          </ButtonGroup> */}
         </Box>
         <Box display="flex" justifyContent="flex-end">
           <input
@@ -124,14 +124,14 @@ export default function SignUpForm(props: SignUpFormProps) {
       </Box>
       <Box marginTop={2} display="flex">
         <Typography variant="h4" component="h4" color="primary">
-          Sign Up
+          สมัครสมาชิก
         </Typography>
       </Box>
       <Box marginTop={2}>
         <TextField
           fullWidth
           id="outlined-phonne-input"
-          label="Mobile Number"
+          label="เบอร์มือถือ"
           type="number"
           variant="outlined"
           value={phone}
@@ -142,7 +142,7 @@ export default function SignUpForm(props: SignUpFormProps) {
         <TextField
           fullWidth
           id="outlined-name-input"
-          label="Name"
+          label="ชื่อ"
           type="text"
           variant="outlined"
           value={firstName}
@@ -153,7 +153,7 @@ export default function SignUpForm(props: SignUpFormProps) {
         <TextField
           fullWidth
           id="outlined-surname-input"
-          label="Surname"
+          label="นามสกุล"
           type="text"
           variant="outlined"
           value={lastName}
@@ -164,7 +164,7 @@ export default function SignUpForm(props: SignUpFormProps) {
         <TextField
           fullWidth
           id="outlined-password-input"
-          label="Password"
+          label="รหัสผ่าน"
           type="password"
           variant="outlined"
           value={password}
@@ -190,7 +190,7 @@ export default function SignUpForm(props: SignUpFormProps) {
           }}
           onClick={() => setGender("male")}
         >
-          Male
+          ชาย
         </Button>
         <Button
           variant={gender === "female" ? "contained" : "outlined"}
@@ -198,7 +198,7 @@ export default function SignUpForm(props: SignUpFormProps) {
           style={{ width: 150 }}
           onClick={() => setGender("female")}
         >
-          Female
+          หญิง
         </Button>
       </Box>
 
@@ -210,7 +210,7 @@ export default function SignUpForm(props: SignUpFormProps) {
           type="submit"
           onClick={handleSubmit}
         >
-          Sign Up
+          สมัครสมาชิก
         </Button>
       </Box>
     </>

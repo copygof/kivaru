@@ -58,7 +58,8 @@ const useStyles = makeStyles({
     borderRadius: 35 / 2,
   },
   dayText: {
-    color: "#D6D6D6",
+    // color: "#D6D6D6",
+    color: "#3C3C59",
     fontSize: 11,
     fontWeight: "bold",
   },
@@ -114,6 +115,16 @@ const useStyles = makeStyles({
     // color: "red",
   },
 })
+
+const dayMapping = {
+  mon: "จ",
+  wue: "อ",
+  wed: "พ",
+  whu: "พฤ",
+  fri: "ศ",
+  sat: "ส",
+  sun: "อา",
+}
 
 function DayBadge({ children, onClick, isActive, disabled }: any) {
   const classes = useStyles()
@@ -208,7 +219,7 @@ function DoctorWorkingDate(props: DoctorWorkingDateProps) {
           />
           <DatePicker
             className={classes.datePicker}
-            label="Date"
+            label="ระบุวันที่นัดหมาย"
             format="DD/MM/YYYY"
             value={selectedDate}
             onChange={handleDateChange}
@@ -222,7 +233,8 @@ function DoctorWorkingDate(props: DoctorWorkingDateProps) {
         </div>
         <div className={classes.dayRow}>
           {props.dayList.map((day) => {
-            console.log("day.isActive => ", day.isActive)
+            // @ts-ignore
+            const dayText = dayMapping[day.name?.toLowerCase()]
             return (
               <DayBadge
                 key={day.name}
@@ -234,7 +246,7 @@ function DoctorWorkingDate(props: DoctorWorkingDateProps) {
                   }
                 }}
               >
-                {day.name}
+                {dayText}
               </DayBadge>
             )
           })}
@@ -246,7 +258,7 @@ function DoctorWorkingDate(props: DoctorWorkingDateProps) {
             className={classes.timePicker}
             clearable
             ampm={false}
-            label="Time"
+            label="ระบุเวลานัดหมาย"
             value={selectedTime}
             onChange={handleTimeChange}
             disabled={props.isDisabledTime}
