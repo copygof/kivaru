@@ -60,7 +60,7 @@ const UserSignUpPage = () => {
       setOpen(false)
       console.log("error => ", error)
       setTimeout(() => {
-        alert("Login failure")
+        alert("Signup failure" + JSON.stringify(error))
       }, 1000)
     }
   }

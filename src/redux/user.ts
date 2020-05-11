@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const initialStateUser = {
+  isRemember: false,
   id: "",
   userGroup: "patient",
   address: {
@@ -59,5 +60,6 @@ export const fullNameSelector = (state: any) =>
   `${state.user.profile.firstName} ${state.user.profile.lastName}`
 
 export const userIdSelector = (state: any) => state.user.id
+export const userIsRememberSelector = (state: any) => state.user.isRemember
 
 export default userSlice.reducer

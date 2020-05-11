@@ -132,7 +132,7 @@ export default function SignUpForm(props: SignUpFormProps) {
           fullWidth
           id="outlined-phonne-input"
           label="Mobile Number"
-          type="text"
+          type="number"
           variant="outlined"
           value={phone}
           onChange={handleOnChange("phone")}

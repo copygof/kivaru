@@ -1,6 +1,6 @@
 import React, { ReactChild } from "react"
 import { useSelector } from "react-redux"
-import { Switch, Route } from "react-router-dom"
+import { Switch, Route, Redirect } from "react-router-dom"
 import UserSignUpPage from "../pages/user/UserSignUpPage"
 import UserLoginPage from "../pages/user/UserLoginPage"
 import PrivateRoute from "./private/PrivateUserRoute"
@@ -40,6 +40,14 @@ export default function UserRoute() {
         <PrivateRoute path="/user/find-doctor">
           <UserFindDoctor />
         </PrivateRoute>
+        <Route path="/user">
+          <Redirect
+            to={{
+              pathname: "/user/login",
+              // state: { from: location },
+            }}
+          />
+        </Route>
         <Route path="*">
           <p>Not fdfd</p>
         </Route>

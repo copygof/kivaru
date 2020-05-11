@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Box,
   Button,
@@ -10,13 +10,17 @@ import {
   Dialog,
 } from "@material-ui/core"
 import { css } from "@emotion/core"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import MoonLoader from "react-spinners/MoonLoader"
 import { NavLink, useHistory } from "react-router-dom"
 import SimpleLayout from "../../components/layout/SimpleLayout"
 import fireStore from "../../fireStore"
 import { login } from "../../redux/auth"
-import { initUser } from "../../redux/user"
+import {
+  initUser,
+  userIsRememberSelector,
+  userIdSelector,
+} from "../../redux/user"
 
 const override = css`
   display: block;
@@ -31,6 +35,18 @@ export default function UserLoginPage() {
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
   const [open, setOpen] = useState(false)
+  const [isRemember, setRemember] = useState(false)
+  const hasRemember = useSelector(userIsRememberSelector)
+  const userId = useSelector(userIdSelector)
+  const isAuthenticated = useSelector(
+    (state: any) => state.auth.isAuthenticated
+  )
+
+  useEffect(() => {
+    if (hasRemember && userId && isAuthenticated) {
+      history.replace("/user/home")
+    }
+  }, [hasRemember, history, isAuthenticated, userId])
 
   function handleClose() {
     setOpen(false)
@@ -39,7 +55,11 @@ export default function UserLoginPage() {
   async function handleOnSubmit() {
     try {
       setOpen(true)
-      const response = await fireStore.user.loginWithPhone(phone, password)
+      const response = await fireStore.user.loginWithPhone(
+        phone,
+        password,
+        "patient"
+      )
       setOpen(false)
       dispatch(
         login({
@@ -47,7 +67,12 @@ export default function UserLoginPage() {
           userId: response.id,
         })
       )
-      dispatch(initUser(response))
+      dispatch(
+        initUser({
+          ...response,
+          isRemember,
+        })
+      )
       history.replace("/user/home")
     } catch (error) {
       setOpen(false)
@@ -62,6 +87,8 @@ export default function UserLoginPage() {
     return (event: any) => {
       if (fieldName === "phone") {
         setPhone(event.target.value)
+      } else if (fieldName === "isRemember") {
+        setRemember(!isRemember)
       } else {
         setPassword(event.target.value)
       }
@@ -98,6 +125,7 @@ export default function UserLoginPage() {
             <FormControlLabel
               control={<Checkbox name="checkedB" color="primary" />}
               label="Remember"
+              onClick={handleOnChangeText("isRemember")}
             />
           </Box>
           <Box

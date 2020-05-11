@@ -39,7 +39,11 @@ export default function NurseLoginPage() {
   async function handleOnSubmit() {
     try {
       setOpen(true)
-      const response = await fireStore.user.loginWithPhone(phone, password)
+      const response = await fireStore.user.loginWithPhone(
+        phone,
+        password,
+        "nurse"
+      )
       setOpen(false)
       dispatch(
         login({

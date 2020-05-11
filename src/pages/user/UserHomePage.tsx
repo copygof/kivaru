@@ -6,6 +6,12 @@ import {
   Toolbar,
   IconButton,
   Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
 } from "@material-ui/core"
 import { useHistory } from "react-router-dom"
 import Menu from "@material-ui/icons/Menu"
@@ -19,6 +25,12 @@ import MenuBox from "../../components/common/MenuBox"
 import { ImageSources } from "../../assets"
 import Banner from "../../components/common/Banner"
 import WrappingVideoCall from "../video/VideoCall"
+import InboxIcon from "@material-ui/icons/MoveToInbox"
+import MailIcon from "@material-ui/icons/Mail"
+import { OfflinePin, SettingsPower } from "@material-ui/icons"
+import { useDispatch } from "react-redux"
+import { logout } from "../../redux/auth"
+import { clearUser } from "../../redux/user"
 
 const useStyles = makeStyles({
   root: {
@@ -107,11 +119,20 @@ function TabHome() {
 
 export default function HomePage() {
   const classes = useStyles()
+  const history = useHistory()
+  const dispatch = useDispatch()
   const [value, setValue] = React.useState(0)
-  let history = useHistory()
+  const [isDrawerVisible, setDrawerVisible] = React.useState(false)
 
-  function handleClick() {
-    history.goBack()
+  function toggleDrawer() {
+    setDrawerVisible(!isDrawerVisible)
+  }
+
+  function handleLogout() {
+    setDrawerVisible(false)
+    dispatch(logout())
+    dispatch(clearUser())
+    history.replace("/")
   }
 
   return (
@@ -122,7 +143,7 @@ export default function HomePage() {
             edge="start"
             color="inherit"
             aria-label="menu"
-            // onClick={handleClick}
+            onClick={toggleDrawer}
           >
             <Menu />
           </IconButton>
@@ -154,6 +175,20 @@ export default function HomePage() {
         />
         <BottomNavigationAction label="Profile" icon={<PersonIcon />} />
       </BottomNavigation>
+      <Drawer open={isDrawerVisible} onClose={toggleDrawer}>
+        <div role="presentation">
+          <div style={{ height: 80 }} />
+          <Divider />
+          <List>
+            <ListItem button onClick={handleLogout}>
+              <ListItemIcon>
+                <SettingsPower />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItem>
+          </List>
+        </div>
+      </Drawer>
     </Box>
   )
 }

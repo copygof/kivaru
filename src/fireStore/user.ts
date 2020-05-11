@@ -70,6 +70,18 @@ export async function uploadImage(image: any) {
 }
 
 export async function createUser(userData: UserSchema) {
+  try {
+    const rest = await db
+      .collection("users")
+      .where("account.userName", "==", userData.account.userName)
+      .where("userGroup", "==", userData.userGroup)
+      .get()
+
+    if (rest) {
+      return Promise.reject("User is already exits")
+    }
+  } catch (error) {}
+
   let imageProfile = ""
 
   if (userData.profile?.imageProfile) {
@@ -91,11 +103,16 @@ export async function createUser(userData: UserSchema) {
     .catch(loggingError("Create user"))
 }
 
-export async function loginWithPhone(phoneNumber: string, password: string) {
+export async function loginWithPhone(
+  phoneNumber: string,
+  password: string,
+  userGroup: "doctor" | "patient" | "nurse"
+) {
   const userDetail = await db
     .collection("users")
     .where("account.userName", "==", phoneNumber)
     .where("account.password", "==", password)
+    .where("userGroup", "==", userGroup)
     .get()
     .then(snapshotOneOfList)
     .then(loggingSuccess("Login with phone number"))

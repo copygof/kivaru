@@ -39,7 +39,11 @@ export default function DoctorLoginPage() {
   async function handleOnSubmit() {
     try {
       setOpen(true)
-      const response = await fireStore.user.loginWithPhone(phone, password)
+      const response = await fireStore.user.loginWithPhone(
+        phone,
+        password,
+        "doctor"
+      )
       setOpen(false)
       dispatch(
         login({
