@@ -76,8 +76,10 @@ export async function createUser(userData: UserSchema) {
       .where("account.userName", "==", userData.account.userName)
       .where("userGroup", "==", userData.userGroup)
       .get()
+      .then(snapshotOneOfList)
 
     if (rest) {
+      console.log("rest => ", rest)
       return Promise.reject("User is already exits")
     }
   } catch (error) {}

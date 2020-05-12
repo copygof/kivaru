@@ -12,6 +12,7 @@ export type DoctorInfoProps = {
   location: string
   rating: number
   isPreview?: boolean
+  isGeneralDoctor?: boolean
 }
 
 const StyledBadge = withStyles((theme) => ({
@@ -155,18 +156,22 @@ const DoctorInfo = (props: DoctorInfoProps) => {
           <Typography variant="h5" className={classes.name}>
             {props.name}
           </Typography>
-          {props.rating > 0 && (
+          {props.rating > 0 && !props.isGeneralDoctor && (
             <>
               <Rating name="read-only" defaultValue={1} max={1} readOnly />
               <Typography className={classes.rating}>{props.rating}</Typography>
             </>
           )}
         </Box>
-        <Typography className={classes.skill}>{props.skill}</Typography>
-        <Typography className={classes.location}>
-          <PlaceOutlined className={classes.iconPlace} />
-          {props.location}
-        </Typography>
+        {!props.isGeneralDoctor && (
+          <>
+            <Typography className={classes.skill}>{props.skill}</Typography>
+            <Typography className={classes.location}>
+              <PlaceOutlined className={classes.iconPlace} />
+              {props.location}
+            </Typography>
+          </>
+        )}
       </Box>
     </Box>
   )

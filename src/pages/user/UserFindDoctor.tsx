@@ -27,6 +27,7 @@ export type ItemProps = {
   location: string
   image: string | any
   rating: number
+  isGeneralDoctor: boolean
   onClick?: () => void
 }
 
@@ -41,11 +42,11 @@ function Item(props: ItemProps) {
         skill={props.skill}
         location={props.location}
         rating={props.rating}
+        isGeneralDoctor={props.isGeneralDoctor}
       />
     </ButtonBase>
   )
 }
-
 
 function DoctorList() {
   const history = useHistory()
@@ -71,6 +72,7 @@ function DoctorList() {
       {doctorList.map((doctor: DoctorSchema & UserSchema) => (
         <Item
           key={doctor.id}
+          isGeneralDoctor={doctor.isGeneralDoctor || false}
           name={`${doctor?.profile?.firstName} ${doctor?.profile?.lastName}`}
           image={doctor.profile.imageProfile}
           skill={doctor.graduate || "-"}

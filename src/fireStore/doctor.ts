@@ -187,16 +187,23 @@ export async function getAllDoctor() {
   const doctorList = await db.collection("doctor").get().then(snapshotAll)
 
   const result = await Promise.all(
-    doctorList.map(async (doctor: DoctorSchema) => {
-      return {
-        ...(await db
-          .collection("users")
-          .doc(doctor.userId)
-          .get()
-          .then(snapshotOne)),
-        ...doctor,
-      }
-    })
+    doctorList
+      .sort((a: any, b: any) => {
+        if (a.isGeneralDoctor === true) {
+          return -1
+        }
+        return 0
+      })
+      .map(async (doctor: DoctorSchema) => {
+        return {
+          ...(await db
+            .collection("users")
+            .doc(doctor.userId)
+            .get()
+            .then(snapshotOne)),
+          ...doctor,
+        }
+      })
   )
 
   return result.map(removeUserNameAndPassword)

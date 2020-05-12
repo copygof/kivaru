@@ -31,6 +31,7 @@ export type ItemProps = {
   rating: number
   onClick?: () => void
   isSelected: boolean
+  isGeneralDoctor: boolean
 }
 
 function Item(props: ItemProps) {
@@ -54,6 +55,7 @@ function Item(props: ItemProps) {
         skill={props.skill}
         location={props.location}
         rating={props.rating}
+        isGeneralDoctor={props.isGeneralDoctor}
       />
     </ButtonBase>
   )
@@ -127,6 +129,7 @@ function DoctorList() {
           location={doctor.hospital || "-"}
           rating={doctor.ratings}
           onClick={handleClickDoctor(doctor.id)}
+          isGeneralDoctor={doctor.isGeneralDoctor || false}
         />
       ))}
     </Box>

@@ -13,7 +13,7 @@ import {
   getDoctorById,
 } from "../../fireStore/doctor"
 
-import { Button, Dialog } from "@material-ui/core"
+import { Button, Dialog, Box } from "@material-ui/core"
 import fireStore from "../../fireStore"
 // import DateFnsUtils from "@date-io/date-fns"
 import MomentUtils from "@date-io/moment"
@@ -71,6 +71,13 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
     )
   }
 
+  const dayList = doctorDetail.isGeneralDoctor
+    ? []
+    : doctorDetail.working?.day || []
+  const timeList = doctorDetail.isGeneralDoctor
+    ? []
+    : doctorDetail.working?.time || []
+
   return (
     <div
       style={{
@@ -85,6 +92,7 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
         name={`${doctorDetail?.profile?.firstName} ${doctorDetail?.profile?.lastName}`}
         skill={doctorDetail?.graduate}
         location={doctorDetail?.hospital}
+        isGeneralDoctor={doctorDetail?.isGeneralDoctor || false}
         image={doctorDetail?.profile?.imageProfile}
         rating={0}
       />
@@ -93,12 +101,16 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
         isDisabledTime={false}
         isDisabledDateList
         isDisabledTimeList
-        dayList={doctorDetail.working?.day || []}
-        timeList={doctorDetail.working?.time || []}
+        dayList={dayList}
+        timeList={timeList}
         onClickDate={handleDateChange}
         onClickTime={handleTimeChange}
       />
-      <DoctorSpecial skill={doctorDetail.specificSkill} />
+      {!doctorDetail?.isGeneralDoctor ? (
+        <DoctorSpecial skill={doctorDetail.specificSkill} />
+      ) : (
+        <Box marginTop={2} />
+      )}
       <Button variant="contained" color="primary" onClick={onSubmit}>
         ระบุวันที่นัดหมาย
       </Button>
