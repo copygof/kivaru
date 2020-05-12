@@ -8,6 +8,7 @@ import Carousel, { Modal, ModalGateway } from "react-images"
 import { useHistory, useParams } from "react-router-dom"
 import fireStore from "../../fireStore"
 import moment from "moment"
+import { UserAttachment } from "../nurse/NurseScreeningPage"
 
 const useStyle = makeStyles({
   symptom: {
@@ -97,63 +98,6 @@ function NurseScreening({ comment }: { comment: string }) {
   )
 }
 
-function UserAttachment() {
-  const classes = useStyle()
-  const [currentImage, setCurrentImage] = useState(0)
-  const [viewerIsOpen, setViewerIsOpen] = useState(false)
-
-  const openLightbox = (index: number) => {
-    setCurrentImage(index)
-    setViewerIsOpen(true)
-  }
-
-  const closeLightbox = () => {
-    setCurrentImage(0)
-    setViewerIsOpen(false)
-  }
-
-  const photos = [
-    {
-      source: "https://picsum.photos/200",
-      title: "Alt",
-    },
-    {
-      source: "https://picsum.photos/200",
-      title: "Alt",
-    },
-    {
-      source: "https://picsum.photos/200",
-      title: "Alt",
-    },
-    {
-      source: "https://picsum.photos/200",
-      title: "Alt",
-    },
-  ]
-
-  return (
-    <div className={classes.attachment}>
-      <p className={classes.attachmentTitle}>Attach</p>
-      <div className={classes.imageRowWrapper}>
-        <div className={classes.imageRow}>
-          {photos.map((v, i) => (
-            <Button key={v.source} onClick={() => openLightbox(i)}>
-              <img className={classes.imageItem} alt="alt" src={v.source} />
-            </Button>
-          ))}
-        </div>
-      </div>
-      <ModalGateway>
-        {viewerIsOpen ? (
-          <Modal onClose={closeLightbox}>
-            <Carousel currentIndex={currentImage} views={photos} />
-          </Modal>
-        ) : null}
-      </ModalGateway>
-    </div>
-  )
-}
-
 function useQueryBookingDetail(bookingId: string) {
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "failure" | "empty"
@@ -223,7 +167,7 @@ function DoctorScreening() {
   Additional detail: ${data.screeningDetail?.nurseComment || "-"}
 `}
       />
-      <UserAttachment />
+      <UserAttachment attachment={data.attachment} />
       <div
         style={{
           display: "flex",

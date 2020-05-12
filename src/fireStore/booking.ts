@@ -1,4 +1,4 @@
-import { createUser, UserSchema, getUserById } from "./user"
+import { createUser, UserSchema, getUserById, uploadImage } from "./user"
 import db from "../config/firestore"
 import * as firebase from "firebase/app"
 import { type } from "os"
@@ -69,7 +69,7 @@ export type BookingSchema = {
   userId: string
   symptom: string
   dayOfSymptom: number
-  attachment: string[]
+  attachment: any[]
   // nurse
   screeningDetail: {
     evaluation: "noPlan" | "moderate" | "verySevere"
@@ -98,6 +98,14 @@ export async function createBooking(booking: {
   attachment: BookingSchema["attachment"]
   parentId?: BookingSchema["parentId"]
 }) {
+  let attachmentId = []
+
+  if (booking.attachment.length) {
+    attachmentId = await Promise.all(
+      booking.attachment.map((att: any) => uploadImage(att?.rawImage || ""))
+    )
+  }
+
   const addResult = await db.collection("booking").add({
     parentId: booking.parentId || "",
     datetime: booking.datetime,
@@ -107,7 +115,7 @@ export async function createBooking(booking: {
     userId: booking.userId,
     symptom: booking.symptom,
     dayOfSymptom: booking.dayOfSymptom,
-    attachment: booking.attachment || [],
+    attachment: attachmentId,
     screeningDetail: {
       evaluation: "noPlan",
       temperature: "",

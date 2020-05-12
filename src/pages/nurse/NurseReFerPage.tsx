@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import _ from "lodash"
 import NavbarLayout from "../../components/layout/NavbarLayout"
 import { Loading } from "../../components/common/Loading"
-import { makeStyles, ButtonBase } from "@material-ui/core"
+import { makeStyles, ButtonBase, Box } from "@material-ui/core"
 import moment from "moment"
 import {
   ArrowLeft,
@@ -317,7 +317,18 @@ function AppointmentCardList({
   }
 
   if (status === "loading") {
-    return <Loading />
+    return (
+      <div
+        style={{
+          display: "flex",
+          // flex: "none",
+          flexFlow: "column",
+          marginTop: 20,
+        }}
+      >
+        <Loading />
+      </div>
+    )
   }
 
   return (
@@ -358,7 +369,7 @@ function NurseReFer({ isNoRefToDoc }: { isNoRefToDoc: boolean }) {
         justifyContent: "flex-start",
       }}
     >
-      <div
+      {/* <div
         style={{
           display: "flex",
           height: 77,
@@ -367,8 +378,11 @@ function NurseReFer({ isNoRefToDoc }: { isNoRefToDoc: boolean }) {
         }}
       >
         <DateCounter onChangeDate={handleChangeDate} />
-      </div>
-      <AppointmentCardList date={date} isNoRefToDoc={isNoRefToDoc} />
+      </div> */}
+      <Box>
+        <DateCounter onChangeDate={handleChangeDate} />
+        <AppointmentCardList date={date} isNoRefToDoc={isNoRefToDoc} />
+      </Box>
       {/* <p style={{ fontSize: 20, textAlign: "center" }}>Not found</p> */}
     </div>
   )

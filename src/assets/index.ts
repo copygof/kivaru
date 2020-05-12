@@ -15,4 +15,5 @@ export const ImageSources = {
   VERY_SEVERE: require("./images/very-severe.png"),
   NO_PLAN: require("./images/no-plan.png"),
   MODERATE: require("./images/moderate.png"),
+  CLIPS: require("./images/clips.png"),
 }

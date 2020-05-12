@@ -78,7 +78,7 @@ function UserSymptomDay({ day }: { day: string }) {
   )
 }
 
-function UserAttachment() {
+export function UserAttachment(props: any) {
   const classes = useStyle()
   const [currentImage, setCurrentImage] = useState(0)
   const [viewerIsOpen, setViewerIsOpen] = useState(false)
@@ -93,31 +93,17 @@ function UserAttachment() {
     setViewerIsOpen(false)
   }
 
-  const photos = [
-    {
-      source: "https://picsum.photos/200",
-      title: "Alt",
-    },
-    {
-      source: "https://picsum.photos/200",
-      title: "Alt",
-    },
-    {
-      source: "https://picsum.photos/200",
-      title: "Alt",
-    },
-    {
-      source: "https://picsum.photos/200",
-      title: "Alt",
-    },
-  ]
+  const photos = (props.attachment || []).map((img: string, i: number) => ({
+    source: img,
+    caption: `attachment ${i + 1}`,
+  }))
 
   return (
     <div className={classes.attachment}>
       <p className={classes.attachmentTitle}>Attach</p>
       <div className={classes.imageRowWrapper}>
         <div className={classes.imageRow}>
-          {photos.map((v, i) => (
+          {photos.map((v: any, i: number) => (
             <Button key={v.source} onClick={() => openLightbox(i)}>
               <img className={classes.imageItem} alt="alt" src={v.source} />
             </Button>
@@ -197,7 +183,7 @@ function NurseScreening() {
       />
       <UserSymptom symptom={data.symptom} />
       <UserSymptomDay day={data.dayOfSymptom} />
-      <UserAttachment />
+      <UserAttachment attachment={data.attachment} />
       <div
         style={{
           display: "flex",

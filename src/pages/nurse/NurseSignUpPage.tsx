@@ -26,7 +26,7 @@ const NurseSignUpPage = () => {
           phoneNumber: values.phone,
           dob: new Date(),
           gender: values.gender,
-          imageProfile: "",
+          imageProfile: values.image || "",
         },
         address: {
           address: "",
