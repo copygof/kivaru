@@ -6,6 +6,12 @@ import {
   Toolbar,
   IconButton,
   Box,
+  Drawer,
+  Divider,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from "@material-ui/core"
 import { useHistory } from "react-router-dom"
 import Menu from "@material-ui/icons/Menu"
@@ -18,6 +24,13 @@ import PersonIcon from "@material-ui/icons/Person"
 import MenuBox from "../../components/common/MenuBox"
 import { ImageSources } from "../../assets"
 import Banner from "../../components/common/Banner"
+import { useDispatch } from "react-redux"
+import { logout } from "../../redux/auth"
+import { clearUser } from "../../redux/user"
+import UserAppointmentDetail from "../user/UserAppointmentDetail"
+import UserProfileById from "../../components/features/UserProfileById"
+import { SettingsPower } from "@material-ui/icons"
+import NurseReFerPage from "./NurseReFerPage"
 
 const useStyles = makeStyles({
   root: {
@@ -31,7 +44,7 @@ const useStyles = makeStyles({
   },
 })
 
-function TabHome() {
+function TabHome({ setValue }: any) {
   const history = useHistory()
 
   function handleMenu(menu: string) {
@@ -42,6 +55,9 @@ function TabHome() {
           break
         case "noRefer":
           history.push("/nurse/no-refer")
+          break
+        case "profile":
+          setValue(2)
           break
         default:
           break
@@ -56,6 +72,7 @@ function TabHome() {
       display="flex"
       justifyContent="space-between"
       alignItems="center"
+      marginTop={10}
     >
       <Box
         flex={1}
@@ -65,20 +82,20 @@ function TabHome() {
         flexWrap="wrap"
       >
         <MenuBox
-          title="Profile"
+          title="โปรไฟล์"
           image={ImageSources.DOCTOR_PROFILE}
           onClick={handleMenu("profile")}
         />
         <MenuBox
-          title="Refer to Doctor"
+          title="ตารางนัดหมาย"
           image={ImageSources.DOCTOR_MEDICINE_DISPENSE}
           onClick={handleMenu("referToDoctor")}
         />
-        <MenuBox
+        {/* <MenuBox
           title="Not Refer to Doctor"
           image={ImageSources.NURSE_NO_REFER}
           onClick={handleMenu("noRefer")}
-        />
+        /> */}
       </Box>
       <Banner image={ImageSources.BANNER_1} />
     </Box>
@@ -87,8 +104,21 @@ function TabHome() {
 
 export default function HomePage() {
   const classes = useStyles()
+  const history = useHistory()
+  const dispatch = useDispatch()
   const [value, setValue] = React.useState(0)
-  let history = useHistory()
+  const [isDrawerVisible, setDrawerVisible] = React.useState(false)
+
+  function toggleDrawer() {
+    setDrawerVisible(!isDrawerVisible)
+  }
+
+  function handleLogout() {
+    setDrawerVisible(false)
+    dispatch(logout())
+    dispatch(clearUser())
+    history.replace("/")
+  }
 
   function handleClick() {
     history.goBack()
@@ -102,22 +132,24 @@ export default function HomePage() {
             edge="start"
             color="inherit"
             aria-label="menu"
-            // onClick={handleClick}
+            onClick={toggleDrawer}
           >
             <Menu />
           </IconButton>
-          <Typography variant="h6">Home</Typography>
+          <Typography variant="h6">หน้าแรก</Typography>
         </Toolbar>
       </AppBar>
       <Container
         maxWidth="sm"
         style={{
-          paddingTop: 100,
-          paddingBottom: 100,
+          // paddingTop: 100,
+          // paddingBottom: 100,
           display: "flex",
         }}
       >
-        {value === 0 && <TabHome />}
+        {value === 0 && <TabHome setValue={setValue} />}
+        {value === 1 && <NurseReFerPage isNoRefToDoc={false} />}
+        {value === 2 && <UserProfileById />}
       </Container>
       <BottomNavigation
         value={value}
@@ -127,13 +159,28 @@ export default function HomePage() {
         showLabels
         className={classes.root}
       >
-        <BottomNavigationAction label="Home" icon={<HomeIcon />} />
+        <BottomNavigationAction label="หน้าแรก" icon={<HomeIcon />} />
         <BottomNavigationAction
-          label="Appointment"
+          label="ตารางนัดหมาย"
           icon={<CalendarTodayIcon />}
         />
-        <BottomNavigationAction label="Profile" icon={<PersonIcon />} />
+        <BottomNavigationAction label="โปรไฟล์" icon={<PersonIcon />} />
       </BottomNavigation>
+      <Drawer open={isDrawerVisible} onClose={toggleDrawer}>
+        <div role="presentation">
+          {/* <div style={{ height: 80 }} /> */}
+          <Divider />
+          <List>
+            <ListItem button onClick={handleLogout}>
+              <ListItemIcon>
+                <SettingsPower />
+              </ListItemIcon>
+              <ListItemText primary="ออกจากระบบ" />
+            </ListItem>
+          </List>
+          <Divider />
+        </div>
+      </Drawer>
     </Box>
   )
 }

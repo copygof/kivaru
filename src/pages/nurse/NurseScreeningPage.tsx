@@ -62,7 +62,7 @@ function UserSymptom({ symptom }: { symptom: string }) {
   const classes = useStyle()
   return (
     <div className={classes.symptom}>
-      <p className={classes.symptomTitle}>Symptom</p>
+      <p className={classes.symptomTitle}>อาการเบื้องต้น</p>
       <p className={classes.symptomDescription}>{symptom}</p>
     </div>
   )
@@ -72,7 +72,7 @@ function UserSymptomDay({ day }: { day: string }) {
   const classes = useStyle()
   return (
     <div className={classes.symptomDay}>
-      <p className={classes.symptomTitle}>Day of Symptom</p>
+      <p className={classes.symptomTitle}>ระยะเวลาที่มีอาการ</p>
       <p className={classes.symptomDescription}>{day}</p>
     </div>
   )
@@ -100,7 +100,7 @@ export function UserAttachment(props: any) {
 
   return (
     <div className={classes.attachment}>
-      <p className={classes.attachmentTitle}>Attach</p>
+      <p className={classes.attachmentTitle}>ไฟล์แนบรูปภาพ</p>
       <div className={classes.imageRowWrapper}>
         <div className={classes.imageRow}>
           {photos.map((v: any, i: number) => (
@@ -216,7 +216,7 @@ function NurseScreening() {
 
 const NurseScreeningPage = () => {
   return (
-    <NavbarLayout pageTitle="Check">
+    <NavbarLayout pageTitle="ข้อมูลคนไข้">
       <React.Suspense fallback={<Loading />}>
         <NurseScreening />
       </React.Suspense>

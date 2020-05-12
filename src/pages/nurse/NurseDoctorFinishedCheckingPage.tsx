@@ -11,6 +11,7 @@ import fireStore from "../../fireStore"
 import { getDoctorById, getDoctorProfileByUserId } from "../../fireStore/doctor"
 import { useDispatch } from "react-redux"
 import { startFinishingFlow } from "../../redux/nurseFinishing"
+import { statusWordingMapping } from "../../config/status"
 
 function useQueryBookingDetail(bookingId: string) {
   const [status, setStatus] = useState<
@@ -173,7 +174,7 @@ function NurseDoctorFinishedChecking() {
       <Box marginTop={2} display="flex" flexDirection="row">
         <Box>
           <Typography style={{ fontWeight: "bold" }} color="secondary">
-            Patient
+            ชื่อคนไข้
           </Typography>
           <Typography
             style={{ fontWeight: "bold" }}
@@ -190,11 +191,13 @@ function NurseDoctorFinishedChecking() {
             height: 34,
             border: "1px solid #ECECEC",
             boxShadow: "0px 1px 3px 0px rgba(0, 0, 0, 0.1)",
+            // @ts-ignore
             color: "#06D81E",
             fontWeight: "bold",
             fontSize: 10,
           }}
         >
+          {/**  @ts-ignore */}
           {data.checkingDetail?.status}
         </Button>
       </Box>
@@ -212,7 +215,7 @@ function NurseDoctorFinishedChecking() {
             fontWeight: "bold",
           }}
         >
-          Next appointment
+          นัดพบครั้งถัดไป
         </Button>
       </Box>
       <Box marginTop={4} display="flex">
@@ -229,7 +232,7 @@ function NurseDoctorFinishedChecking() {
             fontWeight: "bold",
           }}
         >
-          Refer to Doctor
+          ส่งต่อไปยังหมอ
         </Button>
       </Box>
       <Box marginTop={4} display="flex">
@@ -246,7 +249,7 @@ function NurseDoctorFinishedChecking() {
             fontWeight: "bold",
           }}
         >
-          Complete
+          ปิดเคส
         </Button>
       </Box>
 
@@ -306,7 +309,7 @@ function NurseDoctorFinishedChecking() {
 
 export default function NurseDoctorFinishedCheckingPage() {
   return (
-    <NavbarLayout pageTitle="Medical records">
+    <NavbarLayout pageTitle="บันทึกทางการแพทย์">
       <React.Suspense fallback={<Loading />}>
         <NurseDoctorFinishedChecking />
       </React.Suspense>

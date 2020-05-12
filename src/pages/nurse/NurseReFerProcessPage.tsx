@@ -78,7 +78,7 @@ function Evaluation({
   return (
     <Box>
       <Typography style={{ color: "#3D3D3D", fontWeight: "bold" }}>
-        Evaluation
+        การประเมินผล
       </Typography>
       <Box display="flex" justifyContent="space-around" paddingTop="22px">
         <ButtonBase onClick={handleSelectEvaluation("noPlan")}>
@@ -100,7 +100,7 @@ function Evaluation({
                 marginTop: 8,
               }}
             >
-              No Plan
+              ปกติ
             </Typography>
           </Box>
         </ButtonBase>
@@ -123,7 +123,7 @@ function Evaluation({
                 marginTop: 8,
               }}
             >
-              Moderate
+              ปานกลาง
             </Typography>
           </Box>
         </ButtonBase>
@@ -146,7 +146,7 @@ function Evaluation({
                 marginTop: 8,
               }}
             >
-              Very Severe
+              รุนแรงมาก
             </Typography>
           </Box>
         </ButtonBase>
@@ -266,9 +266,9 @@ function NurseReFerProcess() {
             onChange={(e: any) => setAction(e.target?.value || "")}
             input={<BootstrapInput />}
           >
-            <MenuItem value="noReferToDoctor">Not Refer to Doctor</MenuItem>
-            <MenuItem value="referToDoctor">Refer to Doctor</MenuItem>
-            <MenuItem value="nextAppointment">Next Appointment</MenuItem>
+            <MenuItem value="noReferToDoctor">ปิดเคส</MenuItem>
+            <MenuItem value="referToDoctor">ส่งต่อหมอ</MenuItem>
+            <MenuItem value="nextAppointment">นัดครั้งต่อไป</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -279,7 +279,7 @@ function NurseReFerProcess() {
         <TextField
           fullWidth
           id="outlined-password-input"
-          label="Temperature"
+          label="อุณหภูมิ"
           type="textArea"
           variant="outlined"
           value={temperature}
@@ -292,7 +292,7 @@ function NurseReFerProcess() {
           rows={5}
           fullWidth
           id="outlined-password-input"
-          label="Additional"
+          label="ความเห็นเพิ่มเติม"
           type="textArea"
           variant="outlined"
           value={additionalSymptom}
@@ -314,7 +314,7 @@ function NurseReFerProcess() {
             fontWeight: "bold",
           }}
         >
-          Save
+          ถัดไป
         </Button>
       </Box>
       <Dialog onClose={handleClose} open={open}>
@@ -326,7 +326,7 @@ function NurseReFerProcess() {
 
 export default function NurseReFerProcessPage() {
   return (
-    <NavbarLayout pageTitle="Refer to Doctor">
+    <NavbarLayout pageTitle="การวินิจฉัยเบื้องต้น">
       <React.Suspense fallback={<Loading />}>
         <NurseReFerProcess />
       </React.Suspense>

@@ -138,7 +138,7 @@ function DoctorList() {
 
 const UserFindDoctor = () => {
   return (
-    <NavbarLayout pageTitle="Find doctor">
+    <NavbarLayout pageTitle="เลือกแพทย์">
       <React.Suspense fallback={<Loading />}>
         <DoctorList />
       </React.Suspense>

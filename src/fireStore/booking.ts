@@ -195,7 +195,7 @@ export async function getAllBookingRefToDocByDate(
       const result = await Promise.all(
         bookingList
           // .filter((bk: any) => bk.isGeneralDoctor === isGeneralDoctor)
-          .filter((bk: any) => bk.isReferToDoctor === true)
+          // .filter((bk: any) => bk.isReferToDoctor === true)
           .filter((bk: any) => filterStatus.includes(bk.status))
           .map(async (booking: BookingSchema) => {
             const doctor = await getDoctorById(booking.doctorId)
@@ -338,6 +338,7 @@ export async function updateFinishedChecking({
     const bookingDetail = await getBookingById(bookingId)
     const createBookingResponse = await createBooking({
       ...bookingDetail,
+      
       parentId: bookingDetail.parentId,
       doctorId,
       datetime: bookingDateTime || new Date(),

@@ -16,6 +16,7 @@ import { useHistory } from "react-router-dom"
 import resource from "../../resource"
 import ErrorBoundary from "../../components/common/ErrorBoundary"
 import fireStore from "../../fireStore"
+import { statusWordingMapping, statusColorMapping } from "../../config/status"
 
 const useStyles = makeStyles({
   dateCounter: {
@@ -54,6 +55,7 @@ const useStyles = makeStyles({
     marginTop: 8,
     color: "#3D3D3D",
     fontWeight: 400,
+    width: 100,
   },
   "checkStatus-next": {
     backgroundColor: "#FF2A2A",
@@ -110,14 +112,29 @@ const useStyles = makeStyles({
     flex: "0 0 44px",
   },
   appointmentContentTextTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#3D3D3D",
+  },
+  appointmentContentTextTitleDoctor: {
+    fontSize: 14,
+    // fontWeight: "bold",
+    color: "#19769F",
   },
   appointmentContentTextDescription: {
     fontSize: 12,
     color: "#95989A",
-    marginTop: 8,
+    // marginTop: 8,
+  },
+  appointmentContentTextLabel: {
+    fontSize: 14,
+    color: "#95989A",
+  },
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 })
 
@@ -157,10 +174,7 @@ function DateCounter(props: DateCounterProps) {
   )
 }
 
-function AppointmentCheckStatus(props: {
-  number: number
-  status: "next" | "checking" | "scanning"
-}) {
+function AppointmentCheckStatus(props: any) {
   const classes = useStyles()
   return (
     <div className={classes.checkStatus}>
@@ -169,6 +183,9 @@ function AppointmentCheckStatus(props: {
           // @ts-ignore
           classes[`checkStatus-${props.status}`]
         }`}
+        style={{
+          backgroundColor: props.statusColor,
+        }}
       >
         {props.number}
       </p>
@@ -177,8 +194,11 @@ function AppointmentCheckStatus(props: {
           // @ts-ignore
           classes[`checkStatusText-${props.status}`]
         }`}
+        style={{
+          color: props.statusColor,
+        }}
       >
-        {_.upperFirst(props.status)}
+        {_.upperFirst(props.statusText)}
       </p>
     </div>
   )
@@ -187,7 +207,10 @@ function AppointmentCheckStatus(props: {
 function AppointmentCard(props: {
   number: number
   status: "next" | "checking" | "scanning"
+  statusText: string
+  statusColor: string
   name: string
+  doctorName: string
   time: string
   onClick: () => void
 }) {
@@ -212,7 +235,7 @@ function AppointmentCard(props: {
         <div
           style={{
             display: "flex",
-            width: 50,
+            // width: 50,
             flex: "0 0 50px",
             flexDirection: "column",
           }}
@@ -230,10 +253,25 @@ function AppointmentCard(props: {
         </div>
 
         <div className={classes.appointmentContent}>
-          <p className={classes.appointmentContentTextTitle}>{props.name}</p>
-          <p className={classes.appointmentContentTextDescription}>
-            {props.time}
-          </p>
+          <div className={classes.row}>
+            <p className={classes.appointmentContentTextLabel}>ชื่อคนไข้:</p>
+            <p className={classes.appointmentContentTextTitle}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{`${props.name}`}
+            </p>
+          </div>
+          <div className={classes.row}>
+            <p className={classes.appointmentContentTextLabel}>พบคุณหมอ:</p>
+            <p className={classes.appointmentContentTextTitleDoctor}>
+              &nbsp;{`${props.doctorName}`}
+            </p>
+          </div>
+          <div className={classes.row}>
+            <p className={classes.appointmentContentTextLabel}>เวลา:</p>
+            <p className={classes.appointmentContentTextDescription}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{`${props.time}`}
+            </p>
+          </div>
         </div>
         <div
           style={{
@@ -243,7 +281,12 @@ function AppointmentCard(props: {
             flexDirection: "column",
           }}
         >
-          <AppointmentCheckStatus number={props.number} status={props.status} />
+          <AppointmentCheckStatus
+            number={props.number}
+            status={props.status}
+            statusText={props.statusText}
+            statusColor={props.statusColor}
+          />
         </div>
       </div>
     </ButtonBase>
@@ -308,6 +351,8 @@ function AppointmentCardList({
 
   function displayStatus(bookingStatus: string) {
     // @ts-ignore
+    return statusWordingMapping[bookingStatus]
+    // @ts-ignore
     return {
       waitForScanning: "scanning",
       waitForChecking: "scanning",
@@ -344,8 +389,16 @@ function AppointmentCardList({
           key={data.id}
           onClick={() => handleClickSelectCase(data)}
           number={index + 1}
-          status={displayStatus(data.status)}
+          status={data.status}
+          statusText={displayStatus(data.status)}
+          // @ts-ignore
+          statusColor={statusColorMapping[data.status]}
           name={`${data.user?.profile?.firstName} ${data.user?.profile?.lastName}`}
+          doctorName={
+            data.doctor.isGeneralDoctor
+              ? "-"
+              : `${data.doctor?.profile?.firstName} ${data.doctor?.profile?.lastName}`
+          }
           time={moment(data.datetime.seconds * 1000).format("HH:mm")}
         />
       ))}
@@ -395,7 +448,8 @@ export default function NurseReFerPage({
 }) {
   return (
     <NavbarLayout
-      pageTitle={isNoRefToDoc ? "Not Refer to Doctor" : "Refer to Doctor"}
+      // pageTitle={isNoRefToDoc ? "Not Refer to Doctor" : "Refer to Doctor"}
+      pageTitle="ตารางนัดหมาย"
     >
       <ErrorBoundary>
         <React.Suspense fallback={<Loading />}>

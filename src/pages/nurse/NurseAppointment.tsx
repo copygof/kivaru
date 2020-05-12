@@ -8,7 +8,7 @@ import DoctorWorkingDate from "../../components/features/doctor/DoctorWorkingDat
 import MoonLoader from "react-spinners/MoonLoader"
 import { DoctorSchema, WorkingDay, WorkingTime } from "../../fireStore/doctor"
 
-import { Button, Dialog } from "@material-ui/core"
+import { Button, Dialog, Box } from "@material-ui/core"
 import fireStore from "../../fireStore"
 // import DateFnsUtils from "@date-io/date-fns"
 import MomentUtils from "@date-io/moment"
@@ -138,6 +138,13 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
     }
   }
 
+  const dayList = doctorDetail.isGeneralDoctor
+    ? []
+    : doctorDetail.working?.day || []
+  const timeList = doctorDetail.isGeneralDoctor
+    ? []
+    : doctorDetail.working?.time || []
+
   return (
     <div
       style={{
@@ -153,6 +160,7 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
         skill={doctorDetail.graduate}
         location={doctorDetail.hospital}
         image={doctorDetail.profile.imageProfile}
+        isGeneralDoctor={doctorDetail.isGeneralDoctor || false}
         rating={0}
       />
       <DoctorWorkingDate
@@ -163,14 +171,18 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
         isEnableDefaultDateTime
         selectedDate={selectedDate}
         selectedTime={selectedTime}
-        dayList={doctorDetail.working?.day || []}
-        timeList={doctorDetail.working?.time || []}
+        dayList={dayList}
+        timeList={timeList}
         onClickDate={handleDateChange}
         onClickTime={handleTimeChange}
       />
-      <DoctorSpecial skill={doctorDetail.specificSkill} />
+      {!doctorDetail.isGeneralDoctor ? (
+        <DoctorSpecial skill={doctorDetail.specificSkill} />
+      ) : (
+        <Box marginTop={2} />
+      )}
       <Button variant="contained" color="primary" onClick={onSubmit}>
-        Complete
+        ยืนยัน
       </Button>
       <Dialog onClose={handleClose} open={open}>
         <MoonLoader color="#FF2E29" />
@@ -191,7 +203,7 @@ function DoctorProfileFetcher() {
 
 const UserAppointment = () => {
   return (
-    <NavbarLayout pageTitle="Doctor Details">
+    <NavbarLayout pageTitle="นัดหมายวันเวลา">
       <React.Suspense fallback={<Loading />}>
         <DoctorProfileFetcher />
       </React.Suspense>
