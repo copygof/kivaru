@@ -8,7 +8,11 @@ import Carousel, { Modal, ModalGateway } from "react-images"
 import { useHistory, useParams } from "react-router-dom"
 import fireStore from "../../fireStore"
 import moment from "moment"
-import { UserAttachment } from "../nurse/NurseScreeningPage"
+import {
+  UserAttachment,
+  UserSymptom,
+  UserSymptomDay,
+} from "../nurse/NurseScreeningPage"
 
 const useStyle = makeStyles({
   symptom: {
@@ -59,31 +63,31 @@ const useStyle = makeStyles({
   },
 })
 
-function UserSymptom({ symptom }: { symptom: string }) {
-  const classes = useStyle()
-  return (
-    <div className={classes.symptom}>
-      <p className={classes.symptomTitle}>Symptom</p>
-      <p className={classes.symptomDescription}>{symptom}</p>
-    </div>
-  )
-}
+// function UserSymptom({ symptom }: { symptom: string }) {
+//   const classes = useStyle()
+//   return (
+//     <div className={classes.symptom}>
+//       <p className={classes.symptomTitle}>Symptom</p>
+//       <p className={classes.symptomDescription}>{symptom}</p>
+//     </div>
+//   )
+// }
 
-function UserSymptomDay({ day }: { day: string }) {
-  const classes = useStyle()
-  return (
-    <div className={classes.symptomDay}>
-      <p className={classes.symptomTitle}>Day of Symptom</p>
-      <p className={classes.symptomDescription}>{day}</p>
-    </div>
-  )
-}
+// function UserSymptomDay({ day }: { day: string }) {
+//   const classes = useStyle()
+//   return (
+//     <div className={classes.symptomDay}>
+//       <p className={classes.symptomTitle}>Day of Symptom</p>
+//       <p className={classes.symptomDescription}>{day}</p>
+//     </div>
+//   )
+// }
 
 function NurseScreening({ comment }: { comment: string }) {
   const classes = useStyle()
   return (
     <div className={classes.symptomDay}>
-      <p className={classes.symptomTitle}>Nurse screening</p>
+      <p className={classes.symptomTitle}>ความเห็นของพยาบาล</p>
       <p className={classes.symptomDescription}>
         {comment.split("\n").map((item, key) => {
           return (
@@ -162,9 +166,9 @@ function DoctorScreening() {
       <UserSymptomDay day={data.dayOfSymptom} />
       <NurseScreening
         comment={`
-  Evaluation: ${data.screeningDetail?.evaluation || "-"}\n
-  Temperature: ${data.screeningDetail?.temperature || "-"}\n
-  Additional detail: ${data.screeningDetail?.nurseComment || "-"}
+  การประเมินผล: ${data.screeningDetail?.evaluation || "-"}\n
+  อุณหภูมิ: ${data.screeningDetail?.temperature || "-"}\n
+  ความเห็นเพิ่มเติม: ${data.screeningDetail?.nurseComment || "-"}
 `}
       />
       <UserAttachment attachment={data.attachment} />
@@ -200,7 +204,7 @@ function DoctorScreening() {
 
 const DoctorScreeningPage = () => {
   return (
-    <NavbarLayout pageTitle="Check">
+    <NavbarLayout pageTitle="ข้อมูลคนไข้">
       <React.Suspense fallback={<Loading />}>
         <DoctorScreening />
       </React.Suspense>

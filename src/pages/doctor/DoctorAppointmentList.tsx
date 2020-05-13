@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import _ from "lodash"
 import NavbarLayout from "../../components/layout/NavbarLayout"
 import { Loading } from "../../components/common/Loading"
-import { makeStyles, ButtonBase } from "@material-ui/core"
+import { makeStyles, ButtonBase, Box } from "@material-ui/core"
 import moment from "moment"
 import {
   ArrowLeft,
@@ -18,6 +18,8 @@ import UserSelector from "../user/UserSelector"
 import { userIdSelector } from "../../redux/user"
 import { useSelector } from "react-redux"
 import { getDoctorProfileByUserId } from "../../fireStore/doctor"
+import { AppointmentCheckStatus } from "../nurse/NurseReFerPage"
+import { statusWordingMapping, statusColorMapping } from "../../config/status"
 
 const useStyles = makeStyles({
   dateCounter: {
@@ -56,6 +58,7 @@ const useStyles = makeStyles({
     marginTop: 8,
     color: "#3D3D3D",
     fontWeight: 400,
+    width: 100,
   },
   "checkStatus-next": {
     backgroundColor: "#FF2A2A",
@@ -112,14 +115,29 @@ const useStyles = makeStyles({
     flex: "0 0 44px",
   },
   appointmentContentTextTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#3D3D3D",
+  },
+  appointmentContentTextTitleDoctor: {
+    fontSize: 14,
+    // fontWeight: "bold",
+    color: "#19769F",
   },
   appointmentContentTextDescription: {
     fontSize: 12,
     color: "#95989A",
-    marginTop: 8,
+    // marginTop: 8,
+  },
+  appointmentContentTextLabel: {
+    fontSize: 14,
+    color: "#95989A",
+  },
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 })
 
@@ -159,37 +177,79 @@ function DateCounter(props: DateCounterProps) {
   )
 }
 
-function AppointmentCheckStatus(props: {
-  number: number
-  status: "next" | "checking" | "scanning"
-}) {
-  const classes = useStyles()
-  return (
-    <div className={classes.checkStatus}>
-      <p
-        className={`${classes.checkStatusBadge} ${
-          // @ts-ignore
-          classes[`checkStatus-${props.status}`]
-        }`}
-      >
-        {props.number}
-      </p>
-      <p
-        className={`${classes.checkStatusText} ${
-          // @ts-ignore
-          classes[`checkStatusText-${props.status}`]
-        }`}
-      >
-        {_.upperFirst(props.status)}
-      </p>
-    </div>
-  )
-}
+// function AppointmentCard(props: {
+//   number: number
+//   status: "next" | "checking" | "scanning"
+//   name: string
+//   time: string
+//   onClick: () => void
+// }) {
+//   const classes = useStyles()
+//   return (
+//     <ButtonBase
+//       onClick={props.onClick}
+//       style={{
+//         marginTop: 20,
+//       }}
+//     >
+//       <div
+//         className={classes.appointmentCard}
+//         style={{
+//           ...(props.status === "next"
+//             ? {
+//                 border: "1px solid #FF2A2A",
+//               }
+//             : {}),
+//         }}
+//       >
+//         <div
+//           style={{
+//             display: "flex",
+//             width: 50,
+//             flex: "0 0 50px",
+//             flexDirection: "column",
+//           }}
+//         >
+//           <div className={classes.iconItem}>
+//             <Person fontSize="small" color="secondary" />
+//           </div>
+//           <div className={classes.iconItem}>
+//             <Watch
+//               fontSize="small"
+//               color="secondary"
+//               style={{ marginTop: 4 }}
+//             />
+//           </div>
+//         </div>
+
+//         <div className={classes.appointmentContent}>
+//           <p className={classes.appointmentContentTextTitle}>{props.name}</p>
+//           <p className={classes.appointmentContentTextDescription}>
+//             {props.time}
+//           </p>
+//         </div>
+//         <div
+//           style={{
+//             display: "flex",
+//             width: 50,
+//             flex: "0 0 50px",
+//             flexDirection: "column",
+//           }}
+//         >
+//           <AppointmentCheckStatus number={props.number} status={props.status} />
+//         </div>
+//       </div>
+//     </ButtonBase>
+//   )
+// }
 
 function AppointmentCard(props: {
   number: number
   status: "next" | "checking" | "scanning"
+  statusText: string
+  statusColor: string
   name: string
+  doctorName: string
   time: string
   onClick: () => void
 }) {
@@ -214,7 +274,7 @@ function AppointmentCard(props: {
         <div
           style={{
             display: "flex",
-            width: 50,
+            // width: 50,
             flex: "0 0 50px",
             flexDirection: "column",
           }}
@@ -232,10 +292,25 @@ function AppointmentCard(props: {
         </div>
 
         <div className={classes.appointmentContent}>
-          <p className={classes.appointmentContentTextTitle}>{props.name}</p>
-          <p className={classes.appointmentContentTextDescription}>
-            {props.time}
-          </p>
+          <div className={classes.row}>
+            <p className={classes.appointmentContentTextLabel}>ชื่อคนไข้:</p>
+            <p className={classes.appointmentContentTextTitle}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{`${props.name}`}
+            </p>
+          </div>
+          <div className={classes.row}>
+            <p className={classes.appointmentContentTextLabel}>พบคุณหมอ:</p>
+            <p className={classes.appointmentContentTextTitleDoctor}>
+              &nbsp;{`${props.doctorName}`}
+            </p>
+          </div>
+          <div className={classes.row}>
+            <p className={classes.appointmentContentTextLabel}>เวลา:</p>
+            <p className={classes.appointmentContentTextDescription}>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{`${props.time}`}
+            </p>
+          </div>
         </div>
         <div
           style={{
@@ -245,7 +320,12 @@ function AppointmentCard(props: {
             flexDirection: "column",
           }}
         >
-          <AppointmentCheckStatus number={props.number} status={props.status} />
+          <AppointmentCheckStatus
+            number={props.number}
+            status={props.status}
+            statusText={props.statusText}
+            statusColor={props.statusColor}
+          />
         </div>
       </div>
     </ButtonBase>
@@ -287,31 +367,29 @@ function AppointmentCardList({ date }: { date: Date }) {
   const { data: bookingList, status } = useQueryBookingList(date)
 
   function handleClickSelectCase(data: any) {
-    const doctorId = data.doctorId
-    const userId = data.userId
     const bookingId = data.id
-
-    // if (data.status === "waitForComplete") {
-    //   return history.push(
-    //     `/nurse/doctor-finished-checking/${bookingId}/${doctorId}/${userId}`
-    //   )
-    // }
 
     return history.push(`/doctor/check/${bookingId}`)
   }
 
   function displayStatus(bookingStatus: string) {
     // @ts-ignore
-    return {
-      waitForScanning: "scanning",
-      waitForChecking: "scanning",
-      waitForComplete: "checking",
-      complete: "complete",
-    }[bookingStatus]
+    return statusWordingMapping[bookingStatus]
   }
 
   if (status === "loading") {
-    return <Loading />
+    return (
+      <div
+        style={{
+          display: "flex",
+          // flex: "none",
+          flexFlow: "column",
+          marginTop: 20,
+        }}
+      >
+        <Loading />
+      </div>
+    )
   }
 
   return (
@@ -327,8 +405,16 @@ function AppointmentCardList({ date }: { date: Date }) {
           key={data.id}
           onClick={() => handleClickSelectCase(data)}
           number={index + 1}
-          status={displayStatus(data.status)}
+          status={data.status}
+          statusText={displayStatus(data.status)}
+          // @ts-ignore
+          statusColor={statusColorMapping[data.status]}
           name={`${data.user?.profile?.firstName} ${data.user?.profile?.lastName}`}
+          doctorName={
+            data.doctor.isGeneralDoctor
+              ? "-"
+              : `${data.doctor?.profile?.firstName} ${data.doctor?.profile?.lastName}`
+          }
           time={moment(data.datetime.seconds * 1000).format("HH:mm")}
         />
       ))}
@@ -352,24 +438,17 @@ function DoctorAppointmentListFetcher() {
         justifyContent: "flex-start",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          height: 77,
-          flex: "0 0",
-          marginBottom: 30,
-        }}
-      >
+      <Box>
         <DateCounter onChangeDate={handleChangeDate} />
-      </div>
-      <AppointmentCardList date={date} />
-      {/* <p style={{ fontSize: 20, textAlign: "center" }}>Not found</p> */}
+        <AppointmentCardList date={date} />
+      </Box>
     </div>
   )
 }
+
 export default function DoctorAppointmentList() {
   return (
-    <NavbarLayout pageTitle="Appointment List">
+    <NavbarLayout pageTitle="ตารางนัดหมาย">
       <React.Suspense fallback={<Loading />}>
         <DoctorAppointmentListFetcher />
       </React.Suspense>

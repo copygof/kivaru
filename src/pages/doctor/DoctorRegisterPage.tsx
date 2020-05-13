@@ -41,13 +41,13 @@ const DoctorRegisterPage = () => {
   }
 
   return (
-    <NavbarLayout pageTitle="Registration">
-      <>
+    <NavbarLayout pageTitle="สมัครสมาชิก">
+      <div>
         <RegisterForm onSubmit={handleSubmit} />
         <Dialog onClose={handleClose} open={open}>
           <MoonLoader color="#FF2E29" />
         </Dialog>
-      </>
+      </div>
     </NavbarLayout>
   )
 }

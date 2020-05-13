@@ -53,7 +53,7 @@ function DoctorMedicalRecords(params: any) {
       <Box display="flex" justifyContent="space-between"></Box>
       <Box marginTop={2} display="flex">
         <Typography variant="h4" component="h4" color="primary">
-          Medical Note
+          บันทึกการวินิจฉัย
         </Typography>
       </Box>
       <Box marginTop={2}>
@@ -62,7 +62,7 @@ function DoctorMedicalRecords(params: any) {
           rows={5}
           fullWidth
           id="outlined-password-input"
-          label="Additional symptom"
+          label="ความเห็นแพทย์"
           type="textArea"
           variant="outlined"
           value={additionalSymptom}
@@ -86,7 +86,7 @@ function DoctorMedicalRecords(params: any) {
             fontWeight: "bold",
           }}
         >
-          Next appointment
+          นัดพบใหม่
         </Button>
       </Box>
       <Box marginTop={4} display="flex">
@@ -103,7 +103,7 @@ function DoctorMedicalRecords(params: any) {
             fontWeight: "bold",
           }}
         >
-          Refer to Doctor
+          ส่งต่อให้หมอ
         </Button>
       </Box>
       <Box marginTop={4} display="flex">
@@ -120,7 +120,7 @@ function DoctorMedicalRecords(params: any) {
             fontWeight: "bold",
           }}
         >
-          Complete
+          ปิดเคสได้
         </Button>
       </Box>
       <Box marginTop={4} display="flex">
@@ -135,11 +135,13 @@ function DoctorMedicalRecords(params: any) {
             fontWeight: "bold",
           }}
         >
-          Fisnished
+          ยืนยัน
         </Button>
       </Box>
       <Dialog onClose={handleClose} open={open}>
-        <MoonLoader color="#FF2E29" />
+        <div style={{ overflow: "hidden" }}>
+          <MoonLoader color="#FF2E29" />
+        </div>
       </Dialog>
     </div>
   )
@@ -147,7 +149,7 @@ function DoctorMedicalRecords(params: any) {
 
 const DoctorMedicalRecordsPage = () => {
   return (
-    <NavbarLayout pageTitle="Medical records">
+    <NavbarLayout pageTitle="การวินิจฉัย">
       <React.Suspense fallback={<Loading />}>
         <DoctorMedicalRecords />
       </React.Suspense>

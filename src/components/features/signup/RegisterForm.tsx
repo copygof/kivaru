@@ -49,7 +49,7 @@ export default function RegisterForm(props: RegisterFormProps) {
           Registration
         </Typography>
       </Box>
-      <Box marginTop={2}>
+      <Box marginTop={5}>
         <TextField
           fullWidth
           id="outlined-phonne-input"

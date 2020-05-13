@@ -58,7 +58,7 @@ const useStyle = makeStyles({
   },
 })
 
-function UserSymptom({ symptom }: { symptom: string }) {
+export function UserSymptom({ symptom }: { symptom: string }) {
   const classes = useStyle()
   return (
     <div className={classes.symptom}>
@@ -68,7 +68,7 @@ function UserSymptom({ symptom }: { symptom: string }) {
   )
 }
 
-function UserSymptomDay({ day }: { day: string }) {
+export function UserSymptomDay({ day }: { day: string }) {
   const classes = useStyle()
   return (
     <div className={classes.symptomDay}>
@@ -101,22 +101,26 @@ export function UserAttachment(props: any) {
   return (
     <div className={classes.attachment}>
       <p className={classes.attachmentTitle}>ไฟล์แนบรูปภาพ</p>
-      <div className={classes.imageRowWrapper}>
-        <div className={classes.imageRow}>
-          {photos.map((v: any, i: number) => (
-            <Button key={v.source} onClick={() => openLightbox(i)}>
-              <img className={classes.imageItem} alt="alt" src={v.source} />
-            </Button>
-          ))}
+      {photos.length ? (
+        <div className={classes.imageRowWrapper}>
+          <div className={classes.imageRow}>
+            {photos.map((v: any, i: number) => (
+              <Button key={v.source} onClick={() => openLightbox(i)}>
+                <img className={classes.imageItem} alt="alt" src={v.source} />
+              </Button>
+            ))}
+          </div>
         </div>
-      </div>
-      <ModalGateway>
-        {viewerIsOpen ? (
-          <Modal onClose={closeLightbox}>
-            <Carousel currentIndex={currentImage} views={photos} />
-          </Modal>
-        ) : null}
-      </ModalGateway>
+      ) : null}
+      {photos.length ? (
+        <ModalGateway>
+          {viewerIsOpen ? (
+            <Modal onClose={closeLightbox}>
+              <Carousel currentIndex={currentImage} views={photos} />
+            </Modal>
+          ) : null}
+        </ModalGateway>
+      ) : null}
     </div>
   )
 }

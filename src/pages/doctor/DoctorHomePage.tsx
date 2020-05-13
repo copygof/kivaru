@@ -6,6 +6,12 @@ import {
   Toolbar,
   IconButton,
   Box,
+  Drawer,
+  Divider,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from "@material-ui/core"
 import { useHistory } from "react-router-dom"
 import Menu from "@material-ui/icons/Menu"
@@ -18,6 +24,12 @@ import PersonIcon from "@material-ui/icons/Person"
 import MenuBox from "../../components/common/MenuBox"
 import { ImageSources } from "../../assets"
 import Banner from "../../components/common/Banner"
+import { useDispatch } from "react-redux"
+import { logout } from "../../redux/auth"
+import { clearUser } from "../../redux/user"
+import { SettingsPower } from "@material-ui/icons"
+import DoctorAppointmentList from "./DoctorAppointmentList"
+import UserProfileById from "../../components/features/UserProfileById"
 
 const useStyles = makeStyles({
   root: {
@@ -58,6 +70,7 @@ function TabHome() {
       display="flex"
       justifyContent="space-between"
       alignItems="center"
+      marginTop={10}
     >
       <Box
         flex={1}
@@ -67,16 +80,16 @@ function TabHome() {
         flexWrap="wrap"
       >
         <MenuBox
-          title="Profile"
+          title="เวลาเข้างาน"
           image={ImageSources.DOCTOR_PROFILE}
           onClick={handleMenu("profile")}
         />
         <MenuBox
-          title="Appointment"
+          title="ตารางนัดหมาย"
           image={ImageSources.DOCTOR_APPOINTMENT}
           onClick={handleMenu("appointments")}
         />
-        <MenuBox
+        {/* <MenuBox
           title="Medicine Dispense"
           image={ImageSources.DOCTOR_MEDICINE_DISPENSE}
           onClick={handleMenu("medicineDispense")}
@@ -85,7 +98,7 @@ function TabHome() {
           title="Prescription"
           image={ImageSources.DOCTOR_PRESCRIPTION}
           onClick={handleMenu("prescription")}
-        />
+        /> */}
       </Box>
       <Banner image={ImageSources.BANNER_1} />
     </Box>
@@ -94,11 +107,20 @@ function TabHome() {
 
 export default function HomePage() {
   const classes = useStyles()
+  const history = useHistory()
+  const dispatch = useDispatch()
   const [value, setValue] = React.useState(0)
-  let history = useHistory()
+  const [isDrawerVisible, setDrawerVisible] = React.useState(false)
 
-  function handleClick() {
-    history.goBack()
+  function toggleDrawer() {
+    setDrawerVisible(!isDrawerVisible)
+  }
+
+  function handleLogout() {
+    setDrawerVisible(false)
+    dispatch(logout())
+    dispatch(clearUser())
+    history.replace("/")
   }
 
   return (
@@ -109,22 +131,24 @@ export default function HomePage() {
             edge="start"
             color="inherit"
             aria-label="menu"
-            // onClick={handleClick}
+            onClick={toggleDrawer}
           >
             <Menu />
           </IconButton>
-          <Typography variant="h6">Home</Typography>
+          <Typography variant="h6">หน้าแรก</Typography>
         </Toolbar>
       </AppBar>
       <Container
         maxWidth="sm"
         style={{
-          paddingTop: 100,
-          paddingBottom: 100,
+          // paddingTop: 100,
+          // paddingBottom: 100,
           display: "flex",
         }}
       >
         {value === 0 && <TabHome />}
+        {value === 1 && <DoctorAppointmentList />}
+        {value === 2 && <UserProfileById />}
       </Container>
       <BottomNavigation
         value={value}
@@ -134,13 +158,28 @@ export default function HomePage() {
         showLabels
         className={classes.root}
       >
-        <BottomNavigationAction label="Home" icon={<HomeIcon />} />
+        <BottomNavigationAction label="หน้าแรก" icon={<HomeIcon />} />
         <BottomNavigationAction
-          label="Appointment"
+          label="ตารางนัดหมาย"
           icon={<CalendarTodayIcon />}
         />
-        <BottomNavigationAction label="Profile" icon={<PersonIcon />} />
+        <BottomNavigationAction label="โปรไฟล์" icon={<PersonIcon />} />
       </BottomNavigation>
+      <Drawer open={isDrawerVisible} onClose={toggleDrawer}>
+        <div role="presentation">
+          {/* <div style={{ height: 80 }} /> */}
+          <Divider />
+          <List>
+            <ListItem button onClick={handleLogout}>
+              <ListItemIcon>
+                <SettingsPower />
+              </ListItemIcon>
+              <ListItemText primary="ออกจากระบบ" />
+            </ListItem>
+          </List>
+          <Divider />
+        </div>
+      </Drawer>
     </Box>
   )
 }

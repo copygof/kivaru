@@ -36,6 +36,7 @@ const useStyle = makeStyles({
     height: 90,
     borderBottom: "1px solid #D5D5D5",
     backgroundColor: "#ffffff",
+    display: "flex",
   },
 })
 

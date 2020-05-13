@@ -79,13 +79,13 @@ export default function NurseLoginPage() {
   }
 
   return (
-    <SimpleLayout pageTitle="Sign In">
+    <SimpleLayout pageTitle="เข้าสู่ระบบ">
       <>
         <Box marginTop={5}>
           <TextField
             fullWidth
             id="outlined-phone-input"
-            label="Mobile Number"
+            label="เบอร์มือถือ"
             type="phone"
             variant="outlined"
             value={phone}
@@ -96,7 +96,7 @@ export default function NurseLoginPage() {
           <TextField
             fullWidth
             id="outlined-password-input"
-            label="Password"
+            label="รหัสผ่าน"
             type="password"
             variant="outlined"
             value={password}
@@ -107,7 +107,8 @@ export default function NurseLoginPage() {
           <Box flexDirection="column" flex={1} display="flex">
             <FormControlLabel
               control={<Checkbox name="checkedB" color="primary" />}
-              label="Remember"
+              label="จดจำรหัส"
+              onClick={handleOnChangeText("isRemember")}
             />
           </Box>
           <Box
@@ -119,7 +120,7 @@ export default function NurseLoginPage() {
           >
             <Typography component="p">
               <Link href="#" onClick={() => {}}>
-                Forget Password ?
+                ลืมรหัสผ่าน ?
               </Link>
             </Typography>
           </Box>
@@ -131,19 +132,20 @@ export default function NurseLoginPage() {
             fullWidth
             onClick={handleOnSubmit}
           >
-            Sign in
+            เข้าสู่ระบบ
           </Button>
         </Box>
         <Box marginTop={4} display="flex" justifyContent="center">
           <Typography component="p">
-            Don't have an account ?&nbsp;
             <Link to="/nurse/signup" component={NavLink}>
-              Create account
+              สมัครสมาชิกใหม่
             </Link>
           </Typography>
         </Box>
         <Dialog onClose={handleClose} open={open}>
-          <MoonLoader color="#FF2E29" css={override} />
+          <div style={{ overflow: "hidden" }}>
+            <MoonLoader color="#FF2E29" />
+          </div>
         </Dialog>
       </>
     </SimpleLayout>

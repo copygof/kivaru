@@ -57,7 +57,9 @@ export default function UserProfileById() {
         initialValues={initialValues}
       />
       <Dialog onClose={handleClose} open={open}>
-        <MoonLoader color="#FF2E29" />
+        <div style={{ overflow: "hidden" }}>
+          <MoonLoader color="#FF2E29" />
+        </div>
       </Dialog>
     </Box>
   )

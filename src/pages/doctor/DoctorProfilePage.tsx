@@ -7,11 +7,17 @@ import { useSelector } from "react-redux"
 import DoctorWorkingDate from "../../components/features/doctor/DoctorWorkingDate"
 import DoctorSpecial from "./DoctorSpecial"
 import MoonLoader from "react-spinners/MoonLoader"
-import { DoctorSchema, WorkingDay, WorkingTime } from "../../fireStore/doctor"
+import {
+  DoctorSchema,
+  WorkingDay,
+  WorkingTime,
+  getDoctorProfileByUserId,
+} from "../../fireStore/doctor"
 import { UserSchema } from "../../fireStore/user"
 import { Button, Dialog } from "@material-ui/core"
 import { useHistory } from "react-router-dom"
 import fireStore from "../../fireStore"
+import { useDoctorDetail } from "../user/UserAppointment"
 
 type DoctorDetail = DoctorSchema & UserSchema
 
@@ -80,9 +86,11 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
     >
       <DoctorInfo
         isPreview
-        name={`${doctorDetail.profile?.firstName} ${doctorDetail.profile?.lastName}`}
-        skill={doctorDetail.graduate}
-        location={doctorDetail.hospital}
+        name={`${doctorDetail?.profile?.firstName} ${doctorDetail?.profile?.lastName}`}
+        skill={doctorDetail?.graduate}
+        location={doctorDetail?.hospital}
+        isGeneralDoctor={doctorDetail?.isGeneralDoctor || false}
+        image={doctorDetail?.profile?.imageProfile}
         rating={0}
       />
       <DoctorWorkingDate
@@ -100,24 +108,55 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
         Complete
       </Button>
       <Dialog onClose={handleClose} open={open}>
-        <MoonLoader color="#FF2E29" />
+        <div style={{ overflow: "hidden" }}>
+          <MoonLoader color="#FF2E29" />
+        </div>
       </Dialog>
     </div>
   )
 }
 
+export function useDoctorDetailByUserId(userId: string) {
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "failure" | "empty"
+  >("idle")
+  const [data, setData] = useState<any>({})
+
+  useEffect(() => {
+    async function getDoctorDetail() {
+      try {
+        setStatus("loading")
+        const response = await getDoctorProfileByUserId(userId)
+
+        setStatus("success")
+        setData(response)
+      } catch (error) {
+        setStatus("failure")
+        setData({})
+      }
+    }
+
+    getDoctorDetail()
+  }, [userId])
+
+  return { data, status }
+}
+
 function DoctorProfileFetcher() {
   const userId = useSelector((state: any) => state?.auth?.userId)
 
-  const doctorDetail: DoctorDetail = resource.doctor.profileByUserId.read(
-    userId
-  )
+  const { data: doctorDetail, status } = useDoctorDetailByUserId(userId || "")
+
+  if (status === "loading") {
+    return <Loading />
+  }
+
   return <DoctorProfile doctorDetail={doctorDetail} />
 }
 
 function DoctorProfilePage() {
   return (
-    <NavbarLayout pageTitle="Doctor details">
+    <NavbarLayout pageTitle="เวลาเข้างาน">
       <React.Suspense fallback={<Loading />}>
         <DoctorProfileFetcher />
       </React.Suspense>

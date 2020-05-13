@@ -160,7 +160,9 @@ export default function UserLoginPage() {
           </Typography>
         </Box>
         <Dialog onClose={handleClose} open={open}>
-          <MoonLoader color="#FF2E29" css={override} />
+          <div style={{ overflow: "hidden" }}>
+            <MoonLoader color="#FF2E29" />
+          </div>
         </Dialog>
       </>
     </SimpleLayout>

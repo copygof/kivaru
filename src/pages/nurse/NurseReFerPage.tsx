@@ -174,7 +174,7 @@ function DateCounter(props: DateCounterProps) {
   )
 }
 
-function AppointmentCheckStatus(props: any) {
+export function AppointmentCheckStatus(props: any) {
   const classes = useStyles()
   return (
     <div className={classes.checkStatus}>
@@ -352,13 +352,6 @@ function AppointmentCardList({
   function displayStatus(bookingStatus: string) {
     // @ts-ignore
     return statusWordingMapping[bookingStatus]
-    // @ts-ignore
-    return {
-      waitForScanning: "scanning",
-      waitForChecking: "scanning",
-      waitForComplete: "checking",
-      complete: "complete",
-    }[bookingStatus]
   }
 
   if (status === "loading") {
@@ -422,21 +415,10 @@ function NurseReFer({ isNoRefToDoc }: { isNoRefToDoc: boolean }) {
         justifyContent: "flex-start",
       }}
     >
-      {/* <div
-        style={{
-          display: "flex",
-          height: 77,
-          flex: "0 0",
-          marginBottom: 20,
-        }}
-      >
-        <DateCounter onChangeDate={handleChangeDate} />
-      </div> */}
       <Box>
         <DateCounter onChangeDate={handleChangeDate} />
         <AppointmentCardList date={date} isNoRefToDoc={isNoRefToDoc} />
       </Box>
-      {/* <p style={{ fontSize: 20, textAlign: "center" }}>Not found</p> */}
     </div>
   )
 }

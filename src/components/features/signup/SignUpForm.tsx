@@ -73,7 +73,11 @@ export default function SignUpForm(props: SignUpFormProps) {
 
   return (
     <>
-      <Box display="flex" justifyContent="center" alignItems="flex-start">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="flex-start"
+      >
         {/* <Box display="flex">
           <ButtonGroup
             color="primary"

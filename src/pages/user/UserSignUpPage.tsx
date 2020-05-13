@@ -70,7 +70,9 @@ const UserSignUpPage = () => {
       <div>
         <SignUpForm onSubmit={handleSubmit} />
         <Dialog onClose={handleClose} open={open}>
-          <MoonLoader color="#FF2E29" />
+          <div style={{ overflow: "hidden" }}>
+            <MoonLoader color="#FF2E29" />
+          </div>
         </Dialog>
       </div>
     </NavbarLayout>

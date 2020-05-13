@@ -27,6 +27,8 @@ import {
 } from "../../redux/nurseScreening"
 import { nurseFinishingSelector } from "../../redux/nurseFinishing"
 import { updateFinishedChecking } from "../../fireStore/booking"
+import { useDoctorDetailByUserId } from "../doctor/DoctorProfilePage"
+import { useDoctorDetail } from "../user/UserAppointment"
 
 type DoctorDetail = DoctorSchema & UserSchema
 
@@ -156,11 +158,11 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
     >
       <DoctorInfo
         isPreview
-        name={`${doctorDetail.profile?.firstName} ${doctorDetail.profile?.lastName}`}
-        skill={doctorDetail.graduate}
-        location={doctorDetail.hospital}
-        image={doctorDetail.profile.imageProfile}
-        isGeneralDoctor={doctorDetail.isGeneralDoctor || false}
+        name={`${doctorDetail?.profile?.firstName} ${doctorDetail?.profile?.lastName}`}
+        skill={doctorDetail?.graduate}
+        location={doctorDetail?.hospital}
+        image={doctorDetail?.profile?.imageProfile}
+        isGeneralDoctor={doctorDetail?.isGeneralDoctor || false}
         rating={0}
       />
       <DoctorWorkingDate
@@ -185,7 +187,9 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
         ยืนยัน
       </Button>
       <Dialog onClose={handleClose} open={open}>
-        <MoonLoader color="#FF2E29" />
+        <div style={{ overflow: "hidden" }}>
+          <MoonLoader color="#FF2E29" />
+        </div>
       </Dialog>
     </div>
   )
@@ -194,9 +198,11 @@ function DoctorProfile({ doctorDetail }: DoctorProfileProps) {
 function DoctorProfileFetcher() {
   const { id } = useParams()
 
-  const doctorDetail: DoctorSchema & UserSchema = resource.doctor.detail.read(
-    id
-  )
+  const { data: doctorDetail, status } = useDoctorDetail(id || "")
+
+  if (status === "loading") {
+    return <Loading />
+  }
 
   return <DoctorProfile doctorDetail={doctorDetail} />
 }
