@@ -93,6 +93,9 @@ function DoctorList() {
 
   const isFinishingFlow = useSelector(nurseFinishingSelector.getIsFinishingFlow)
   const doctorId = useSelector(nurseScreeningSelector.getDoctorId)
+  const isRefToDoctor = useSelector(
+    nurseScreeningSelector.getNurseScreeningIsRefToDoc
+  )
   const doctorIdFinishingFlow = useSelector(nurseFinishingSelector.getDoctorId)
 
   const selectedDoctorId = isFinishingFlow ? doctorIdFinishingFlow : doctorId
@@ -119,19 +122,23 @@ function DoctorList() {
       // alignItems="center"
       flexDirection="column"
     >
-      {doctorList.map((doctor: DoctorSchema & UserSchema) => (
-        <Item
-          key={doctor.id}
-          isSelected={selectedDoctorId === doctor.id}
-          name={`${doctor?.profile?.firstName} ${doctor?.profile?.lastName}`}
-          image={doctor.profile.imageProfile}
-          skill={doctor.graduate || "-"}
-          location={doctor.hospital || "-"}
-          rating={doctor.ratings}
-          onClick={handleClickDoctor(doctor.id)}
-          isGeneralDoctor={doctor.isGeneralDoctor || false}
-        />
-      ))}
+      {doctorList
+        .filter((doctor: DoctorSchema & UserSchema) =>
+          isRefToDoctor ? doctor.isGeneralDoctor === false : true
+        )
+        .map((doctor: DoctorSchema & UserSchema) => (
+          <Item
+            key={doctor.id}
+            isSelected={selectedDoctorId === doctor.id}
+            name={`${doctor?.profile?.firstName} ${doctor?.profile?.lastName}`}
+            image={doctor.profile.imageProfile}
+            skill={doctor.graduate || "-"}
+            location={doctor.hospital || "-"}
+            rating={doctor.ratings}
+            onClick={handleClickDoctor(doctor.id)}
+            isGeneralDoctor={doctor.isGeneralDoctor || false}
+          />
+        ))}
     </Box>
   )
 }

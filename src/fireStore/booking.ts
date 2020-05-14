@@ -171,7 +171,11 @@ export async function getBookingByUserId(userId: string) {
 export async function getAllBookingRefToDocByDate(
   date: Date,
   isGeneralDoctor: boolean = false,
-  filterStatus: string[] = ["waitForScanning", "waitForComplete"]
+  filterStatus: string[] = [
+    "waitForScanning",
+    "waitForChecking",
+    "waitForComplete",
+  ]
 ) {
   let start = new Date(date)
   let end = new Date(date)
@@ -338,7 +342,7 @@ export async function updateFinishedChecking({
     const bookingDetail = await getBookingById(bookingId)
     const createBookingResponse = await createBooking({
       ...bookingDetail,
-      
+
       parentId: bookingDetail.parentId,
       doctorId,
       datetime: bookingDateTime || new Date(),

@@ -30,6 +30,8 @@ export const { refToDocPrepared, clearScreening } = nurseScreeningSlice.actions
 
 export const nurseScreeningSelector = {
   getNurseScreening: (state: any) => state.nurseScreening,
+  getNurseScreeningIsRefToDoc: (state: any) =>
+    state.nurseScreening.screeningDetail.status === "referToDoctor",
   getDoctorId: (state: any) => state.nurseScreening.doctorId,
 }
 
