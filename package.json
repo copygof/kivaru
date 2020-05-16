@@ -24,6 +24,7 @@
     "@types/react-router-dom": "^5.1.4",
     "@types/react-star-rating-component": "^1.4.0",
     "@types/redux-persist": "^4.3.1",
+    "express": "^4.17.1",
     "firebase": "^7.14.1",
     "firebase-admin": "^8.10.0",
     "font-awesome": "^4.7.0",
