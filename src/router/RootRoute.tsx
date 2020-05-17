@@ -16,7 +16,7 @@ export default function RootRoute() {
   // let location = useLocation()
 
   return (
-    <Router basename="/kivaru">
+    <Router>
       <TransitionGroup>
         <CSSTransition
           // key={location.key}
