@@ -16,7 +16,7 @@ export default function RootRoute() {
   // let location = useLocation()
 
   return (
-    <Router>
+    <Router basename="http://203.154.83.208/app">
       <TransitionGroup>
         <CSSTransition
           // key={location.key}
