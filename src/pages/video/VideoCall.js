@@ -121,7 +121,7 @@ class App extends Component {
     socket
       .on("init", ({ userId: clientId }) => {
         console.log("client init", clientId)
-        document.title = `${clientId} - VideoCall`
+        // document.title = `${clientId} - VideoCall`
         this.setState({ clientId })
       })
       .on("request", ({ from: callFrom, fromName: callFromName }) => {
