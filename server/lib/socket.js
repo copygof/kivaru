@@ -1,4 +1,4 @@
-// const io = require("socket.io")
+const io = require("socket.io")
 // const io = require("socket.io")(80)
 const users = require("./users")
 
@@ -19,8 +19,8 @@ function initSocket(socket) {
           ...data,
           socket,
         })
-        socket.emit("init", user)
-        console.log("Create user success ", user)
+        socket.emit("init", data)
+        console.log("Create user success ", data)
       } catch (error) {
         console.log("Crearte user failure ", error)
       }
@@ -74,13 +74,13 @@ function initSocket(socket) {
 
 // io.on("connection", initSocket)
 
-module.exports = initSocket
+// module.exports = initSocket
 
-// module.exports = (server) => {
-//   io({ path: "/bridge", serveClient: true })
-//     .listen(server, { log: true })
-//     .on("connection", initSocket)
-// }
+module.exports = (server) => {
+  io({ path: "/bridge", serveClient: true })
+    .listen(server, { log: true })
+    .on("connection", initSocket)
+}
 
 // const io = require("socket.io")
 // const users = require("./users")

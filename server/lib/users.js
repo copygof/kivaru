@@ -22,7 +22,13 @@ const users = {}
 
 exports.create = async (socket) => {
   users[socket.userId] = socket
-  console.log("All users => ", users)
+  console.log(
+    "All users => ",
+    Object.keys(users).map((v) => ({
+      userId: users[v].userId,
+      userName: users[v].userName,
+    }))
+  )
   return socket
 }
 
